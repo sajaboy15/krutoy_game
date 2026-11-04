@@ -455,7 +455,7 @@ const FAC = G.FAC = { Q: {}, NPC: {}, talk: {}, props: [] };
 
   /* ================================================================ the journal: [N] (GDD ch. 23) — quests by faction, and where you stand */
   const J = FAC.J = { open: false, tab: 0, sel: 0, t: 0, blocker: false };
-  const TABS = [`Faction work|Дела фракций|Fraksiya ishlari`, `Standing|Положение|Mavqe`, `Done|Завершённое|Yakunlangan`];
+  const TABS = [`Open work|Дела|Ochiq ishlar`, `Standing|Положение|Mavqe`, `Done|Завершённое|Yakunlangan`];
   const FAC_TITLE = { singers: REP_NAME.singers, divan: REP_NAME.divan, remember: REP_NAME.remember, tail: REP_NAME.tail, rabat: REP_NAME.rabat };
   FAC.J.list = () => {
     const s = F6(), out = [];
@@ -539,7 +539,7 @@ const FAC = G.FAC = { Q: {}, NPC: {}, talk: {}, props: [] };
     } else {
       const want = J.tab === 0 ? (q => q.st === 'active') : (q => q.st === 'done' || q.st === 'failed');
       const list = FAC.J.list().filter(r => want(r.q));
-      if (!list.length) text(ctx, t(J.tab === 0 ? `Nothing open. Faction people will find you, or you them.|Открытых дел нет. Люди фракций найдут тебя — или ты их.|Ochiq ish yo'q. Fraksiya odamlari seni topadi — yoki sen ularni.` : `Nothing finished yet.|Пока ничего не завершено.|Hozircha hech narsa yakunlanmagan.`), X + 24, y0 + 4, { size: 6, color: '#9a8a78' });
+      if (!list.length) text(ctx, t(J.tab === 0 ? `Nothing open. People with troubles will find you, or you them.|Открытых дел нет. Люди со своими бедами найдут тебя — или ты их.|Ochiq ish yo'q. Dardi borlar seni topadi — yoki sen ularni.` : `Nothing finished yet.|Пока ничего не завершено.|Hozircha hech narsa yakunlanmagan.`), X + 24, y0 + 4, { size: 6, color: '#9a8a78' });
       J.sel = Math.min(J.sel, Math.max(0, list.length - 1));
       const top = Math.max(0, J.sel - 5);
       let y = y0;
