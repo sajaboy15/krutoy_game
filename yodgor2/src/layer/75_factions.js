@@ -193,9 +193,21 @@ const FAC = G.FAC = { Q: {}, NPC: {}, talk: {}, props: [] };
   // things to use at a spot when the story wants them: prop(region, spot, {art, prompt, when(), use(done, it), dx})
   FAC.prop = (region, spot, o) => FAC.props.push(Object.assign({ region, spot }, o));
   s6init(() => {
-    W2x().onEnter('*', (def, info) => {
+    // a prop whose moment comes while the hero is already in its region appears at once (checked every second)
+    let ptk = 0;
+    W2x().ticks.push(() => {
+      if (++ptk % 60 || !G.world || !G.level || !G.level.w2) return;
+      const W = W2x(), id = W.active; if (!id || W.inside) return;
+      const have = new Set(G.world.ents.filter(e => e && !e.dead && e._f6).map(e => e._f6));
+      const want = FAC.props.filter(pr => pr.region === id && !have.has(pr.id || pr.spot) && !(FAC._propDone && FAC._propDone[pr.id || pr.spot]) && (!pr.when || (() => { try { return pr.when(); } catch (e) { return false; } })()));
+      if (want.length) FAC._spawnProps(W.regions[id], { level: G.level }, want);
+    });
+    W2x().onEnter('*', (def, info) => FAC._spawnProps(def, info, FAC.props));
+  });
+  FAC._spawnProps = (def, info, list) => {
+    {
       const L = info.level, spots = (L && L.w2 && L.w2.spots) || {};
-      for (const pr of FAC.props) {
+      for (const pr of list) {
         if (pr.region !== def.id) continue;
         try {
           if (pr.when && !pr.when()) continue;
@@ -213,8 +225,8 @@ const FAC = G.FAC = { Q: {}, NPC: {}, talk: {}, props: [] };
           if (pr.spawn) pr.spawn(it, at, L);
         } catch (e) { console.error('[s6] prop', e); }
       }
-    });
-  });
+    }
+  };
   // small object art for the arcs: a glint, a wax crate, a stack of debt books, a household chest
   const RR = (c, x, y, w, h, col) => { c.fillStyle = col; c.fillRect(Math.round(x), Math.round(y), w, h); };
   G.ObjArt.f6glint = (c, o) => {
