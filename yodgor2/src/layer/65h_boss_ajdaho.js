@@ -29,7 +29,7 @@
     const lob = (b, x0, y0, tx, u, o) => {
       const a = A(), g = .22, vx = (tx - x0) / u, vy = (a.floor - 3 - y0 - .5 * g * u * u) / u;
       return b.add(new G.Projectile(Object.assign({ x: x0, y: y0, vx, vy, grav: g, r: 5, faction: 'enemy', owner: b, dmg: .55 * b.dmg, life: 220, color: FIRE, kbx: 2.5, kby: -3, status: burn(), light: { r: 70, color: '#ffb040', a: .8 }, trail: { color: '#ff8a2a', life: 14, size: 1, every: 1 }, info: { dmgColor: '#ffb040' },
-        onWall: e => { if (!b.dead && b.mode !== 'dying') b.add(new KIT.FirePool(e.x, a.floor, { w: 30, life: 120, pal: G.Art.FLAME_FIRE, glowC: '#ff8a2a', dmg: .3 * b.dmg, status: burn() })); },
+        onWall: e => { if (!b.dead && b.mode !== 'dying') b.add(new KIT.FirePool(e.x, a.floor, { w: 30, life: (o && o.poolLife) || 120, pal: G.Art.FLAME_FIRE, glowC: '#ff8a2a', dmg: .3 * b.dmg, status: burn() })); },
         onDie: e => G.FX.explosion(e.x, e.y - 2, { size: 's', pal: 'fire', shake: .06 }) }, o || {})));
     };
     const poolThreat = (b, x, inF) => BM.threat(b, { in: inF, dur: 120, box: { x: x - 18, y: A().floor - 14, w: 36, h: 14 }, how: 'out' });
@@ -215,7 +215,8 @@
           steer(b, b.hx + 200 * m.dir, a.floor - 135 + 16 * Math.sin(k * .08), 4.4, .12); b.jaw = .8;
           if ((k - m.W) % 18 === 0 && b.hx > a.x0 && b.hx < a.x1 && BM.okP(pl)) {
             const mo = mouth(b), tx = clamp(pl.x + U.rand(-30, 30), a.x0 + 10, a.x1 - 10), u = 36;
-            lob(b, mo.x, mo.y, tx, u); BM.mark(b, tx, 30, u + 2, FIRE, { hgt: 18 }); BM.threat(b, { in: u, dur: 110, box: { x: tx - 18, y: a.floor - 20, w: 36, h: 20 }, how: 'out' }); sfx('fire', { x: mo.x, vol: .5 });
+            lob(b, mo.x, mo.y, tx, u, { poolLife: 70 }); BM.mark(b, tx, 30, u + 2, FIRE, { hgt: 18 }); BM.threat(b, { in: u, dur: 70, box: { x: tx - 18, y: a.floor - 20, w: 36, h: 20 }, how: 'out' });
+            { const sw = Math.abs(tx - mo.x) / u * 10 + 24; BM.threat(b, { in: u - 10, dur: 12, box: { x: tx > mo.x ? tx + 12 - sw : tx - 12, y: a.floor - 40, w: sw, h: 40 }, how: 'out' }); }   // the fireball's last frames cross the hero's height sfx('fire', { x: mo.x, vol: .5 });
           }
           return (m.dir > 0 && b.hx > a.x1 + 60) || (m.dir < 0 && b.hx < a.x0 - 60) || k > 260;
         } }

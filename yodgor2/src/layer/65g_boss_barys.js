@@ -46,7 +46,7 @@
         if (t >= T && t <= T + 4) BM.strike(b, swipeBox(b), { k: i === n - 1 ? .8 : .6, kbx: 3.5, kby: -3.5, status: cold() }, m['s' + i] || (m['s' + i] = new Set()));
       }
     }
-    const swipeThreats = (b, T0, n) => { for (let i = 0; i < n; i++) BM.threat(b, { in: T0 + i * 36, dur: 5, box: () => { const q = swipeBox(b), st = i === n - 1 ? 18 : 10; return { x: b.facing > 0 ? q.x : q.x - st, y: q.y, w: q.w + st, h: q.h }; }, how: 'roll', noWalk: true }); };
+    const swipeThreats = (b, T0, n) => { for (let i = 0; i < n; i++) BM.threat(b, { in: T0 + i * 36, dur: 5, box: () => { const pl = b.player, f0 = b.facing; if (BM.okP(pl)) b.facing = Math.sign(pl.x - b.x) || f0; const q = swipeBox(b), st = i === n - 1 ? 18 : 10, f = b.facing; b.facing = f0; return { x: f > 0 ? q.x : q.x - st, y: q.y, w: q.w + st, h: q.h }; }, how: 'roll', noWalk: true }); };
 
     const moves = {
       pounce: { w: [5, 4, 3], range: [50, 999], open: [40, 36, 32],

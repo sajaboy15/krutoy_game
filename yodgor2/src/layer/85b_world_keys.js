@@ -285,6 +285,7 @@
           self.usedUp = true; self.dead = true; W2.take(id);
           if (o.key) W2.giveKey(o.key);
           if (o.legend && G.CH && G.CH.grantLegend) G.CH.grantLegend(o.legend);
+          if (o.gold) { try { G.Pickups.gold(self.x, self.y - 10, o.gold); } catch (e) { console.error(e); } }
           sfx('ready');
         };
         if (o.lines) scene(done => play(o.lines, () => { give(); done(); })); else give();
