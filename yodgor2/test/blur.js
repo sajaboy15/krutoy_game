@@ -1,0 +1,10 @@
+const L = require('./lib');
+(async () => { const b = await L.chromium.launch({ args: ['--use-gl=swiftshader', '--ignore-gpu-blocklist'] });
+ const p = await b.newPage({ viewport: { width: 1366, height: 768 } });
+ await p.goto('file://' + require('path').resolve(__dirname, '../dist/standalone.html')); await p.waitForTimeout(900);
+ await p.evaluate(() => { document.getElementById('gate').hidden = true; }); await p.evaluate(() => G.debugTick(120));
+ const info = await p.evaluate(() => { const g = document.getElementById('game'), f = document.getElementById('fx'), h = document.getElementById('hud'); const r = g.getBoundingClientRect(); return { game: [r.width, r.height], fx: f && [f.width, f.height, f.style.width], hud: [h.width, h.height, h.style.width], dpr: devicePixelRatio }; });
+ console.log(JSON.stringify(info));
+ await p.screenshot({ path: 'out/blur_ultra.png' });
+ await p.evaluate(() => G.GFX.set('classic')); await p.evaluate(() => G.debugTick(2)); await p.screenshot({ path: 'out/blur_classic.png' });
+ await b.close(); })();

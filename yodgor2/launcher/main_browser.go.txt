@@ -1,0 +1,108 @@
+//go:build windows
+
+// Запуск «Ёдгора»: игра встроена в exe, открывается в окне Chrome или Edge.
+package main
+
+import (
+	_ "embed"
+	"net"
+	"net/http"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"syscall"
+	"unsafe"
+)
+
+//go:embed game.html
+var game []byte
+
+const fixedAddr = "127.0.0.1:47819" // постоянный адрес — чтобы сохранялись выборы и финалы
+
+var procMessageBoxW = syscall.NewLazyDLL("user32.dll").NewProc("MessageBoxW")
+
+func msgBox(text string) {
+	t, _ := syscall.UTF16PtrFromString("Ёдгор")
+	m, _ := syscall.UTF16PtrFromString(text)
+	procMessageBoxW.Call(0, uintptr(unsafe.Pointer(m)), uintptr(unsafe.Pointer(t)), 0x40)
+}
+
+func findBrowser() string {
+	pf, pf86, local := os.Getenv("ProgramFiles"), os.Getenv("ProgramFiles(x86)"), os.Getenv("LOCALAPPDATA")
+	cands := []string{
+		filepath.Join(pf, `Google\Chrome\Application\chrome.exe`),
+		filepath.Join(pf86, `Google\Chrome\Application\chrome.exe`),
+		filepath.Join(local, `Google\Chrome\Application\chrome.exe`),
+		filepath.Join(pf86, `Microsoft\Edge\Application\msedge.exe`),
+		filepath.Join(pf, `Microsoft\Edge\Application\msedge.exe`),
+	}
+	for _, c := range cands {
+		if st, err := os.Stat(c); err == nil && !st.IsDir() {
+			return c
+		}
+	}
+	return ""
+}
+
+func openWindow(browser, url string) *exec.Cmd {
+	profile := filepath.Join(os.Getenv("LOCALAPPDATA"), "Yodgor2", "browser")
+	_ = os.MkdirAll(profile, 0o755)
+	cmd := exec.Command(browser,
+		"--app="+url,
+		"--user-data-dir="+profile,
+		"--window-size=1280,760",
+		"--no-first-run",
+		"--no-default-browser-check",
+		"--autoplay-policy=no-user-gesture-required",
+	)
+	if err := cmd.Start(); err != nil {
+		return nil
+	}
+	return cmd
+}
+
+func openDefault(url string) error {
+	return exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+}
+
+func main() {
+	browser := findBrowser()
+
+	ln, err := net.Listen("tcp", fixedAddr)
+	if err != nil {
+		// Игра уже запущена: просто открыть ещё одно окно с ней.
+		url := "http://" + fixedAddr + "/"
+		if browser != "" && openWindow(browser, url) != nil {
+			return
+		}
+		if openDefault(url) != nil {
+			msgBox("Could not open the game: port 47819 is busy.")
+		}
+		return
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" && r.URL.Path != "/index.html" {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+		_, _ = w.Write(game)
+	})
+	go func() { _ = http.Serve(ln, mux) }()
+	url := "http://" + fixedAddr + "/"
+
+	if browser != "" {
+		if cmd := openWindow(browser, url); cmd != nil {
+			_ = cmd.Wait()
+			return
+		}
+	}
+	if err := openDefault(url); err != nil {
+		msgBox("Browser not found. Please install Google Chrome or Microsoft Edge.\nБраузер не найден. Установите Chrome или Edge.")
+		return
+	}
+	msgBox("The game is open in your browser.\nClose this window when you finish playing.")
+}
