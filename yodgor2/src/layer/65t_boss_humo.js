@@ -135,5 +135,68 @@
     { const T0 = G.Boss.prototype.takeHit; const def2 = G.Enemies.defs.f_humo; def2._armourCheck = true;
       G.Boss.prototype.takeHit = function (h) { if (this.def && this.def.id === 'f_humo' && this.data && this.data.armour) { try { G.FX.text(this.x, this.top - 10, G.LANG.t(`Gold!|Золото!|Oltin!`), '#ffd04a', { size: 6, life: 20 }); sfx('block', { x: this.x }); } catch (e) { /* ignore */ } return false; } return T0.apply(this, arguments); }; }
     { const op = def.onPhase; def.onPhase = function (b, ph) { op && op.call(this, b, ph); BM.specs.f_humo.onPhase(b, ph); }; }
+    /* Humo's own body (it was the eagle's puppet recoloured): a bird of beaten gold, a crest like a crown, three long tail
+       plumes with turquoise eyes, wings of overlapping gold feathers edged with coins, and small warm windows in the chest —
+       the childhoods it is made of. Poses: flying (flap), diving (wings back), beak in the stone, skimming (wings flat),
+       folded (wings wrapped round the body). Drawn straight on the world (square pixels, no rotation). */
+    {
+      const C = ['#3a1e06', '#6a3c0c', '#a06a16', '#c8901e', '#f0c040', '#fff0b0'];
+      const R = Math.round;
+      const dot = (ctx, x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(R(x), R(y), w, h); };
+      function feather(ctx, sx, sy, ang, len, w, cols, f) {
+        const ca = Math.cos(ang) * f, sa = Math.sin(ang);
+        for (let k = 0; k < len; k += 1) { const q = k / len, ww = Math.max(2, R(w * (1 - q * .45))); dot(ctx, sx + ca * k - ww / 2, sy + sa * k - ww / 2, ww, ww, q > .8 ? cols[2] : q > .4 ? cols[1] : cols[0]); }
+        dot(ctx, sx + ca * len, sy + sa * len, 2, 2, '#fff4c8');      // a coin at the tip
+      }
+      function wing(ctx, sx, sy, base, spread, f, near) {
+        const cols = near ? ['#b07a1c', '#e8b432', '#fff0b0'] : ['#6a3c0c', '#a06a16', '#c8901e'];
+        // primaries first (long, outer), the coverts last (short, over them): a solid wing with a scalloped edge
+        for (let j = 8; j >= 0; j--) feather(ctx, sx - j * 1.5 * f, sy + j * .5, base + j * spread, 20 + j * 4, near ? 6 : 5, cols, f);
+        for (let j = 0; j < 5; j++) feather(ctx, sx - j * 1.5 * f, sy + j * .5, base + j * spread + .05, 10 + j * 2, near ? 7 : 6, [cols[1], cols[1], cols[2]], f);
+      }
+      def.drawBoss = function (ctx, b) {
+        if (!(b.alpha > .01)) return;
+        const d = b.data || {}, t = b.t || 0, f = b.facing || 1, h = b.h || 40;
+        const stuck = d.rec > 0 && d.recMv === 'dive', diving = d.mv === 'dive' && b.vy > .5, low = d.mv === 'rake' || d.mv === 'storm', fold = !!d.fold;
+        const cx = R(b.x), cy = R(b.y - h * .55 + (stuck ? 8 : 0));
+        ctx.save(); ctx.globalAlpha = b.alpha == null ? 1 : b.alpha;
+        const flap = fold ? 0 : stuck ? .9 : diving ? -1.2 : low ? .15 : Math.sin(t * .22);
+        // tail plumes with eyes
+        for (let i = 0; i < 3; i++) {
+          const L = 34 + i * 10;
+          for (let k = 0; k < L; k += 1.5) { const q = k / L, x = cx - f * (8 + k * (.95 - i * .12)), y = cy + 2 + k * (.25 + i * .2) + Math.sin(t * .12 + q * 4 + i) * 3 * q; dot(ctx, x, y, q < .6 ? 2 : 1, 2, q < .4 ? C[3] : C[4]); }
+          const ex = cx - f * (8 + L * (.95 - i * .12)), ey = cy + 2 + L * (.25 + i * .2) + Math.sin(t * .12 + 4 + i) * 3;
+          dot(ctx, ex - 2, ey - 2, 5, 5, C[3]); dot(ctx, ex - 1, ey - 1, 3, 3, '#3ac8d0'); dot(ctx, ex, ey, 1, 1, '#0a3a4a');
+        }
+        // far wing
+        if (!fold) wing(ctx, cx + 2 * f, cy - 5, -2.3 + flap * .6 + (diving ? 1.1 : 0), .12, f, false);
+        // body: beaten gold, darker underneath, scales
+        for (let y = -10; y <= 10; y++) {
+          const hw = R(15 * Math.sqrt(Math.max(0, 1 - (y / 10.5) ** 2)));
+          for (let x = -hw; x <= hw; x++) {
+            const v = -y / 10 * .7 + x * f / 15 * .3, sc = ((x + 40) % 4 === 0 && (y + 40) % 3 === 0);
+            dot(ctx, cx + x, cy + y, 1, 1, sc ? C[2] : v > .55 ? C[5] : v > .15 ? C[4] : v > -.3 ? C[3] : C[2]);
+          }
+        }
+        // the childhoods: small windows of warm light in the chest
+        for (let i = 0; i < 3; i++) { const k = .55 + .45 * Math.sin(t * .1 + i * 2.1); ctx.globalAlpha = (b.alpha == null ? 1 : b.alpha) * k; dot(ctx, cx + f * (3 + i * 3) - 1, cy + 1 + (i % 2) * 3, 2, 3, '#fff4d0'); }
+        ctx.globalAlpha = b.alpha == null ? 1 : b.alpha;
+        // neck, head, crest, beak
+        const hx = cx + f * (stuck ? 12 : diving ? 13 : 15), hy = cy + (stuck ? 9 : diving ? 4 : -11);
+        for (let k = 0; k < 6; k++) dot(ctx, cx + f * (9 + k * .9) - 2, cy - 4 + (hy - cy + 4) * k / 6, 5, 3, C[3]);
+        for (let y = -5; y <= 5; y++) { const hw = R(5 * Math.sqrt(Math.max(0, 1 - (y / 5.5) ** 2))); for (let x = -hw; x <= hw; x++) dot(ctx, hx + x, hy + y, 1, 1, y < -2 ? C[5] : x * f > 2 ? C[3] : C[4]); }
+        for (let i = 0; i < 3; i++) for (let k = 0; k < 7 + i * 2; k++) dot(ctx, hx - f * (1 + i * 2 + k * .5), hy - 5 - k + (k > 5 ? (k - 5) * .6 : 0), 1, 1, k > 5 + i ? '#fff4c8' : C[4]);
+        const bd = stuck ? 1 : 0;   // the beak points down when it sticks in the stone
+        for (let k = 0; k < 7; k++) dot(ctx, hx + f * (5 + k * (bd ? .4 : 1)), hy + (bd ? 2 + k : 0) - (k < 4 ? 1 : 0), 1, k < 4 ? 3 : 2, k < 3 ? '#fff4c8' : '#8a5a10');
+        dot(ctx, hx + f * 2, hy - 1, 1, 1, '#1a0a04'); if ((t >> 4) % 6) dot(ctx, hx + f * 2, hy - 2, 1, 1, '#ffffff');
+        // legs tucked (talons when skimming low)
+        if (low || stuck) for (const lx of [-3, 3]) { dot(ctx, cx + lx, cy + 9, 1, 5, C[1]); dot(ctx, cx + lx - 1, cy + 14, 3, 1, '#fff4c8'); }
+        // near wing, or the wings wrapped round the body (fold: the gold armour)
+        if (fold) { for (let k = 0; k < 9; k++) { dot(ctx, cx - 13 + k * 3, cy - 12 + (k % 2), 3, 24, k % 2 ? C[4] : C[3]); dot(ctx, cx - 13 + k * 3, cy + 11, 3, 2, '#fff4c8'); } }
+        else wing(ctx, cx - 1 * f, cy - 3, -2.0 + flap * .75 + (diving ? 1.2 : 0) + (low ? .6 : 0), .12, f, true);
+        ctx.restore();
+        if (b.hurtT > 0 && (t & 2)) { ctx.globalAlpha = .4; ctx.fillStyle = '#ffffff'; ctx.fillRect(cx - 16, cy - 11, 32, 22); ctx.globalAlpha = 1; }
+      };
+    }
   } catch (e) { console.error('[f_humo]', e); }
 }
