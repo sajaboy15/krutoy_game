@@ -78,7 +78,7 @@
 
   /* ---------------------------------------------------------------- the Salt Mines */
   local('tally', 'mines', 0.45, { name: `A debtor with a tally stick|Должник с биркой|Birkali qarzdor`, look: 'tailman', prompt: `Talk to the debtor|Поговорить с должником|Qarzdor bilan gaplashish` }, [
-    ['', `"Three hundred and twelve days. Forty-one to go. A notch for every one — the overseer's count and mine never agree."|«Триста двенадцать дней. Осталось сорок один. Каждый день — зарубка. У надсмотрщика счёт свой, у меня свой, и они не сходятся».|«Uch yuz o'n ikki kun. Qirq bir kun qoldi. Har kuniga bitta chiziq. Nazoratchining hisobi boshqa, meniki boshqa — hech to'g'ri kelmaydi».`],
+    ['', `"Three hundred and twelve days. Forty-one to go. A notch for every one — the overseer's count and mine never agree."|«Триста двенадцать дней. Ещё сорок один. Каждый день — зарубка. У надсмотрщика счёт свой, у меня свой, и они не сходятся».|«Uch yuz o'n ikki kun. Qirq bir kun qoldi. Har kuniga bitta chiziq. Nazoratchining hisobi boshqa, meniki boshqa — hech to'g'ri kelmaydi».`],
     ['hero', `Whose count wins?|И чей счёт верный?|Qaysi biri to'g'ri?`],
     ['', `"His. Mine is so I don't forget I'm counting."|«Его, конечно. А мой — чтобы не забыть, что я считаю».|«Albatta, uniki. Meniki esa — sanayotganimni unutmaslik uchun».`]
   ], `"Three hundred and twelve. No — thirteen. See? That's why I cut them."|«Триста двенадцать. Нет, тринадцать. Видишь? Поэтому и режу».|«Uch yuz o'n ikki. Yo'q, o'n uch. Ko'rdingmi? Shuning uchun chizaman».`);
@@ -93,7 +93,7 @@
 
   /* ---------------------------------------------------------------- the Tower of Silence */
   local('keeper', 'tower', 0.62, { name: `The keeper of the empty|Смотритель пустых|Bo'shlar qorovuli`, look: 'elder', prompt: `Talk to the keeper|Поговорить со смотрителем|Qorovul bilan gaplashish` }, [
-    ['', `"They bring them here when they're empty. Not the people — the tumars. People we bury down the hill, like anyone."|«Сюда несут, когда опустеют. Не людей — тумары. Людей хороним под холмом, как всех».|«Bo'shab qolganda shu yerga olib kelishadi. Odamlarni emas — tumarlarni. Odamlarni tepalik ostiga ko'mamiz, hammanikidek».`],
+    ['', `"They bring them here when they're empty. Not the people — the tumars. People we bury down the hill, like anyone."|«Сюда несут, когда опустеют. Не людей — тумары. Людей хороним под холмом, как всех».|«Bo'shab qolganda shu yerga olib kelishadi. Odamlarni emas — tumarlarni. Odamlarni esa tepalik ostiga, hammani qanday ko'msak, shunday ko'mamiz».`],
     ['hero', `And the crows?|А вороны?|Qarg'alar-chi?`],
     ['', `"They peck the wax. Hoping something's left. Nothing ever is — but I don't chase them. Hope is a hard habit to lose."|«Клюют воск. Надеются, вдруг что осталось. Никогда не остаётся — но я их не гоняю. От надежды трудно отвыкнуть».|«Mumni cho'qishadi. Balki biror narsa qolgandir, deb umid qilishadi. Hech qachon qolmaydi — lekin men ularni haydamayman. Umiddan voz kechish qiyin».`]
   ], `"Mind the heaps. Each one was somebody's wedding once."|«Под ноги смотри. Каждая куча когда-то была чьей-то свадьбой».|«Oyog'ingga qara. Har bir uyum qachonlardir kimningdir to'yi bo'lgan».`);
