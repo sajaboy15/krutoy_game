@@ -76,7 +76,7 @@
   }
   function options() {
     G.UI.choice({
-      title: t(`Options|Параметры|Sozlamalar`), cancel: true,
+      title: t(`Language & display|Язык и экран|Til va ekran`), cancel: true,
       options: [
         { label: t(`Language|Язык|Til`) + ': ' + LANG.NAMES[LANG.lang], value: 'lang' },
         { label: t(`Display & graphics|Экран и графика|Ekran va grafika`), value: 'gfx' },
@@ -99,7 +99,7 @@
     const li = M.findIndex(x => x && x.act === 'lang');
     if (li >= 0) M.splice(li, 1);
     const oi = M.findIndex(x => x && x.act === 'options');
-    const ol = t(`Options|Параметры|Sozlamalar`);
+    const ol = t(`Language & display|Язык и экран|Til va ekran`);
     if (oi < 0) { const at = M.findIndex(x => x && x.label === 'Управление'); M.splice(at < 0 ? M.length : at, 0, { label: ol, act: 'options' }); } else M[oi].label = ol;
     const qi = M.findIndex(x => x && x.act === 'quit');
     const ql = t(`Exit the game|Выйти из игры|O'yindan chiqish`);
