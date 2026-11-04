@@ -23,9 +23,10 @@ const FR = [0.12, 0.37, 0.62, 0.88];
     for (const f of FR) {
       await W(([x]) => {
         const L = G.level, pl = G.world.player;
-        pl.x = Math.max(80, Math.min(L.pw - 80, x));
-        const d = G.WORLD2.regions[G.WORLD2.active], y0 = d && d.outdoor === false ? Math.max(16, L.spawn.y - 8 * 16) : 16;
-        pl.y = L.groundBelow(pl.x, y0, 4000) || L.spawn.y; pl.vx = pl.vy = 0;
+        // stand on the real floor nearest to x (a floor run with head room), never inside rock
+        let best = null, bd = 1e9;
+        for (const r of G.BiomeKit.floorRuns(L, 2, 3)) { const cx = Math.max(r.x0 * 16 + 8, Math.min(r.x1 * 16 + 8, x)), d = Math.abs(cx - x) + Math.abs(r.y - L.spawn.y) * 0.05; if (d < bd) { bd = d; best = { x: cx, y: r.y }; } }
+        pl.x = best ? best.x : Math.max(80, Math.min(L.pw - 80, x)); pl.y = best ? best.y - 1 : L.spawn.y; pl.vx = pl.vy = 0;
         for (const e of G.world.enemies) if (Math.abs(e.x - pl.x) < 120) e.x += 200;
         G.cam.snap(pl.x, pl.y - 40);
       }, [info.pw * f]);

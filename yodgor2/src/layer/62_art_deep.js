@@ -1673,6 +1673,8 @@
         particles({ rate: .15, cols: ['#1a0408', '#2a0a10'], vx: [.1, .4], vy: [.15, .4], from: 'top', life: 500, alpha: .8 }));
     });
 
-    G.ART_DEEP = { ids: DEEP_IDS };
+    G.ART_DEEP = { ids: DEEP_IDS, painter, paint, ramp, rampAt, pn2, pfbm, dome, minaret, archShape, windows, sky, glow, shaftSprite, fogBand, lay, dlay, onS, addDecorate, both,
+      particles, vignetteCv, vgradCv, blendFill, tileX, rootDeco, nicheLamp, crystalDeco, fungusDeco, causticDeco, fishDeco, floatLantern, lanternString, beamDeco,
+      spaced, air, caveWindows, tiltedHouse, islandSprite, camRef, lazy };
   }
 }

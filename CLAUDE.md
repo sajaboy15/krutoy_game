@@ -53,6 +53,8 @@ Roadmap = GDD chapter 26. Progress ≈ 62%. Review sheets for all rewritten text
 
 - **Stage 8a, Souls-like boss movesets** (65a kit `G.BM` + 65b–65h). Every move fires (test/s8_moves.js); waves are telegraphed from the windup; companions read `G.BM` threats; Ajdaho hp 760. Results and open points: notes/stage8a_bosses.md.
 
+**Regions, pass 1 (5 Nov 2026):** src/layer/85d_world_dress.js dresses every region along its full length (lights every N px on every floor run + a grid pass for rooms/pits, region props, hanging things, lit cracks, animated workers/porters/mourners/birds/bats, 17 hidden caches), opens deep backgrounds (graded parallax + haze), new looks for the Tower of Silence (ash dusk, dakhmas, vultures, braziers, ossuaries) and the Withers (dawn over a sea of clouds, Sky Caravanserai). 61/62 now export their painters (G.ART_CITY, G.ART_DEEP). Shots: test/s9_regions.js <tag>; before/after: notes/regions_before_after.jpg. Still to do: interactive NPCs/events per region, the Cloister/Old Yodgor/Karez/Cistern are only lit, region minutes still 30–45% of plan.
+
 **TOP PRIORITY NEXT (the author's complaint)**
 - **Regions look empty.** Many are sparse or too dark: Swallowed Streets, Heart, Salt Mines, Tower of Silence, Rabat.
   - Cause: the art was made for the old short stages; the widened regions have bare walls and empty backgrounds.

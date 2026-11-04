@@ -1582,5 +1582,9 @@
   }
 
   ART.tailProps = tailProps;
+  // the painters, for later layers that dress the open-world regions (85d_world_dress.js)
+  Object.assign(ART, { P32, mix, shade, hash, n1, n2, fbm, rngOf, paintSky, ridge, house, dome, minaret, portal, fortWall, tree, sprite, SPR, rope, cloud,
+    refOf, layer, glowCv, skyDraw, twinkles, hazeDraw, shafts, grade, vignette, all, emit, prop, addStatic, jarCv, carpetCv, tandirCv, columnCv, lamp, cloth,
+    runs, busyXs, free, inStruct, interiors, memo, place, fgPaint, fgLayers, smokeLayer });
 })();
 }
