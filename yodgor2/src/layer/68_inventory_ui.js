@@ -582,11 +582,11 @@
   // drawn last, over the cards, toasts and HUD frames of 98_ui_art.js
   setTimeout(() => { PIXEL_DRAW.push(PIX_UI); SMOOTH_DRAW.push(SMOOTH_UI); }, 0);
   function header(ctx) {
-    const W2 = PAGES.length > 3 ? 70 : 92, gap = 6, x0 = G.W / 2 - (PAGES.length * W2 + (PAGES.length - 1) * gap) / 2 + (PAGES.length > 3 ? 22 : 0); // [stage 7 hook] page count
+    const W2 = PAGES.length > 4 ? 56 : PAGES.length > 3 ? 70 : 92, gap = PAGES.length > 4 ? 4 : 6, x0 = G.W / 2 - (PAGES.length * W2 + (PAGES.length - 1) * gap) / 2 + (PAGES.length > 4 ? 26 : PAGES.length > 3 ? 22 : 0); // [stage 7 hook] page count
     PAGES.forEach((pg, i) => {
       const x = x0 + i * (W2 + gap), on = UI.page === pg;
       plate(ctx, x, 16, W2, on ? '#5a3a14' : '#241a30', on);
-      txt(ctx, t(PAGE_NAME[pg]).toUpperCase() + '  [' + PAGE_KEY[pg] + ']', x + W2 / 2, 18.6, { size: 5.6, weight: 600, align: 'center', color: on ? COL.goldL : COL.dim, serif: true });
+      txt(ctx, t(PAGE_NAME[pg]).toUpperCase() + '  [' + PAGE_KEY[pg] + ']', x + W2 / 2, PAGES.length > 4 ? 19.2 : 18.6, { size: PAGES.length > 4 ? 4.4 : 5.6, weight: 600, align: 'center', color: on ? COL.goldL : COL.dim, serif: true });
       HIT.push({ x, y: 14, w: W2, h: 15, click: () => { setPage(pg); sfx('ui_move'); } });
     });
     // left: name and level; right: tilla and Hollowness

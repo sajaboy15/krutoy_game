@@ -829,8 +829,8 @@
   gear({ id: 'mat_wax', type: 'material', name: `Wax|Воск|Mum`, desc: `For tumars and charms.|Для тумаров и оберегов.|Tumarlar va ko'zmunchoqlar uchun.`, icon: ICO.wax('#e8d8a8', '#ffffff'), dropW: 4, price: 12 });
   gear({ id: 'mat_thread', type: 'material', name: `Silk thread|Шёлковая нить|Ipak ip`, desc: `Tumars are sewn with it.|Ею шьют тумары.|U bilan tumar tikiladi.`, icon: ICO.thread(), dropW: 4, price: 15 });
   gear({ id: 'mat_herbs', type: 'material', name: `Herbs: wormwood, isiriq, sage|Травы: полынь, исрык, шалфей|O'tlar: shuvoq, isiriq, marmarak`, desc: `For the herbalist's brews.|Для отваров травницы.|Tabib damlamalari uchun.`, icon: ICO.herb('#7a9a4a'), dropW: 4, price: 8 });
-  gear({ id: 'it_plov', type: 'consumable', name: `Plov|Плов|Palov`, desc: `For this land: +10% health.|На эту землю: +10% здоровья.|Shu yer uchun: +10% sog'liq.`, icon: ICO.bowl('#c8a060', '#e8b860'), dropW: 2, price: 30, yd: { use: 'plov' } });
-  gear({ id: 'it_samsa', type: 'consumable', name: `Samsa|Самса|Somsa`, desc: `For this land: stamina returns 25% faster.|На эту землю: выносливость возвращается на 25% быстрее.|Shu yer uchun: chidam 25% tezroq qaytadi.`, icon: ICO.samsa(), dropW: 2, price: 20, yd: { use: 'samsa' } });
+  gear({ id: 'it_plov', type: 'consumable', name: `Plov|Плов|Palov`, desc: `10 min: +10% health.|10 мин: +10% здоровья.|10 daq.: +10% sog'liq.`, icon: ICO.bowl('#c8a060', '#e8b860'), dropW: 2, price: 30, yd: { use: 'plov' } });
+  gear({ id: 'it_samsa', type: 'consumable', name: `Samsa|Самса|Somsa`, desc: `10 min: stamina returns 25% faster.|10 мин: выносливость возвращается на 25% быстрее.|10 daq.: chidam 25% tezroq qaytadi.`, icon: ICO.samsa(), dropW: 2, price: 20, yd: { use: 'samsa' } });
   gear({ id: 'it_bitter_tea', type: 'consumable', name: `Bitter tea|Горький чай|Achchiq choy`, desc: `Rare. Hollowness −3; clears oblivion.|Редкость. Пустота −3; снимает забвение.|Kamyob. Bo'shliq −3; unutishni ketkazadi.`, icon: ICO.bowl('#5a3a1a', '#3a2a10'), dropW: 0.5, minStage: 2, price: 90, yd: { use: 'tea' } });
   gear({ id: 'it_bandage', type: 'consumable', name: `Bandage|Бинт|Bint`, desc: `Stops bleeding and mends 8% health.|Останавливает кровь и лечит 8% здоровья.|Qonni to'xtatadi va 8% sog'liq tiklaydi.`, icon: ICO.bandage(), dropW: 3, price: 15, yd: { use: 'bandage' } });
   gear({ id: 'it_antidote', type: 'consumable', name: `Antidote|Противоядие|Panzahr`, desc: `Cures poison; poison resistance +50% for this land.|Лечит яд; сопротивление яду +50% до конца земли.|Zaharni davolaydi; shu yer oxirigacha zaharga chidamlilik +50%.`, icon: ICO.vial('#8fe35a'), dropW: 2, price: 25, yd: { use: 'antidote' } });
@@ -1376,8 +1376,8 @@
     if (!p || p.dead) return false;
     if (ty === 'consumable') {
       const k = d.yd.use;
-      if (k === 'plov') { G.Buffs.add('plov', 9999, { mods: { maxHp: v => v * 1.1 } }); CH.dirty(); CH.syncHp(); p.heal(Math.round(p.maxHp * 0.1)); }
-      else if (k === 'samsa') G.Buffs.add('samsa', 9999, { mods: { stamRegen: v => v * 1.25 } });
+      if (k === 'plov') { G.Buffs.add('plov', 600, { mods: { maxHp: v => v * 1.1 } }); CH.dirty(); CH.syncHp(); p.heal(Math.round(p.maxHp * 0.1)); }
+      else if (k === 'samsa') G.Buffs.add('samsa', 600, { mods: { stamRegen: v => v * 1.25 } });
       else if (k === 'tea') { addVoid(-3, `bitter tea|горький чай|achchiq choy`); }
       else if (k === 'bandage') { if (p.st) p.st.bleed = null; p.heal(Math.round(p.maxHp * 0.08)); }
       else if (k === 'antidote') { if (p.st) p.st.poison = null; G.Buffs.add('antidote', 9999, { mods: { res_poison: v => v + 0.5 } }); }
@@ -1387,7 +1387,7 @@
     }
     return false;
   };
-  ON_STAGE.push(() => { for (const k of ['plov', 'samsa', 'antidote', 'firebrew', 'ys_drink', 'humo']) { const L = G.Buffs.list(); const i = L.findIndex(b => b.id === k); if (i >= 0) L.splice(i, 1); } CH.dirty(); });
+  ON_STAGE.push(() => { for (const k of ['antidote', 'firebrew', 'ys_drink', 'humo']) { const L = G.Buffs.list(); const i = L.findIndex(b => b.id === k); if (i >= 0) L.splice(i, 1); } CH.dirty(); });
   const DRINK = [
     { name: `courage|отвага|jasorat`, mods: { dmgOut: v => v * 1.1 } },
     { name: `endurance|выносливость|chidam`, mods: { stamMax: v => v * 1.15 } },

@@ -53,7 +53,7 @@
     'Удар о землю': ['Ground slam', 'Yerga zarba'], '↓ + ПРОБЕЛ': ['↓ + SPACE', '↓ + SPACE'],
     'Спрыгнуть вниз': ['Drop down', 'Pastga tushish'], 'Карта': ['Map', 'Xarita'], 'Пауза': ['Pause', 'Pauza'],
     'Инвентарь': ['Inventory', 'Inventar'], 'Персонаж, атрибуты': ['Character, attributes', 'Qahramon, xususiyatlar'], 'Навыки ёдчи': ['Yodchi skills', 'Yodchi mahoratlari'],
-    'Спутники': ['Companions', 'Hamrohlar'], 'Журнал': ['Journal', 'Kundalik'], 'Стойка спутников': ["Companions' stance", 'Hamrohlar holati'],
+    'Спутники': ['Companions', 'Hamrohlar'], 'Журнал': ['Journal', 'Kundalik'], 'Книга ёдчи': ["Yodchi's book", 'Yodchi kitobi'], 'Стойка спутников': ["Companions' stance", 'Hamrohlar holati'],
     'Приказ Алпу, Наргизе, Сурайё': ['Order Alp, Nargiza, Surayyo', 'Alp, Nargiza, Surayyoga buyruq'], 'Крюк': ['Hook', 'Ilgak'],
     'Садо приглушает свет': ['Sado dims her light', 'Sado nurini pasaytiradi'], 'Сбросить графику': ['Reset graphics', 'Grafikani tiklash'],
     'Во весь экран': ['Full screen', "To'liq ekran"], 'Стр. 1/2  ← →': ['Page 1/2  ← →', '1/2-bet  ← →'], 'Стр. 2/2  ← →': ['Page 2/2  ← →', '2/2-bet  ← →'],
