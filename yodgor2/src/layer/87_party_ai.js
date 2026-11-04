@@ -473,6 +473,25 @@
         if (this.dodgeT === 0) this.facing = sgn(p.x - this.x) || this.facing;
         return true;
       }
+      // a boss's telegraphed blow (G.BM threats, 65a): they read the wind-up like the hero does — and miss a quarter of them
+      if (this.onGround && G.Game.boss && G.BM && G.BM.live) {
+        const now = G.BM.now(), mb = this.box();
+        for (const th of G.BM.live()) {
+          const seen = th._cs || (th._cs = {});
+          if (seen[this.id]) continue;
+          const bx = typeof th.box === 'function' ? th.box() : th.box; if (!bx) continue;
+          let left = th.at - now, hit;
+          if (th.wave) { const dd = (this.x - th.wave.x0) * th.wave.dir; if (dd < -8) continue; left = th.wave.t0 + Math.round((dd - 14) / th.wave.spd) - now; hit = true; }
+          else hit = mb.x - 6 < bx.x + bx.w && mb.x + mb.w + 6 > bx.x && mb.y - 6 < bx.y + bx.h && mb.y + mb.h + 6 > bx.y;
+          if (!hit || left > 10 || left < -1) continue;
+          seen[this.id] = 1;
+          if (Math.random() > (this.def.dodgeK || 0.75)) continue;
+          if (th.how === 'jump' || th.wave) this.hop(34, 0, this.vx);
+          else { const cx = bx.x + bx.w / 2; this.dodgeDir = sgn(this.x - cx) || -this.facing; this.dodgeT = 20; this.invulnT = Math.max(this.invulnT || 0, 12); }
+          PX.dodges = (PX.dodges || 0) + 1; PX.tdodges = (PX.tdodges || 0) + 1;
+          return true;
+        }
+      }
       if (this.t % 4 || !this.onGround || this.stance === 'silent' && !G.Game.boss) return false;
       const BK = G.BossKit; if (!BK) return false;
       const b = this.box(), x0 = b.x - 4, x1 = b.x + b.w + 4;
