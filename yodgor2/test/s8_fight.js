@@ -95,7 +95,7 @@ fs.mkdirSync(LOGS, { recursive: true });
       for (const e of G.world.enemies) if (e && !e.dead && !e.isBoss && !e.isBossPart && e.bossOwner && Math.abs(e.x - pl.x) < 60 && Math.abs(e.y - pl.y) < 40) { tg = e; break; }
       // the perfect bot attacks in the boss's windows (or while nothing is being prepared); the others are greedier
       const bzz = G.Game.boss, safe = mode !== 'perfect' || !bzz || (tg && !tg.isBoss && !tg.isBossPart) || (bzz.data && (bzz.data.rec > 14 || (!bzz.data.mv && !bzz.data.hold && bzz.atkCD > 22)));
-      if (tg && soon > 34 && safe) {
+      if (tg && soon > (mode === 'perfect' ? 48 : 34) && safe) {
         const side = Math.sign(pl.x - tg.x) || -1, want = tg.x + side * dist;
         if (Math.abs(want - pl.x) > 6 && !inp.down.left && !inp.down.right) { if (want > pl.x) inp.down.right = true; else inp.down.left = true; }
         if (!pl.act && Math.abs(want - pl.x) < 16) pl.facing = Math.sign(tg.x - pl.x) || 1;
@@ -136,7 +136,7 @@ fs.mkdirSync(LOGS, { recursive: true });
       const stats = G.PARTY && G.PARTY.stats ? { boss: G.PARTY.stats.boss, taken: G.PARTY.stats.taken } : null;
       return { killed: !!(bz.dead || bz.mode === 'dying' || G.Game.stage.cleared), secs: +((G.world.t - R.t0) / 60).toFixed(1), hpLeft: +(Math.max(0, bz.hp) / bz.maxHp).toFixed(3), phase: bz.phase,
         bossHp: R.bossHp, bossDmg: R.bossDmg, heroHp: R.heroHp, hitsTaken: hits.filter(h => !h.minion).length, dmgTaken: Math.round(hits.filter(h => !h.minion).reduce((s, h) => s + h.dmg, 0)), minionHits: hits.filter(h => h.minion).length,
-        perMove: per, hitList: hits.filter(h => !h.minion).slice(0, 30).map(h => [h.mv, h.ph, h.dx, h.py, h.st, Math.round(h.dmg)]), moves, gaps, phases, rolls: R.rolls, jumps: R.jumps, fails: R.fails, attacks: R.attacks, heroDmg: Math.round(R.heroDmg), boxLog: bz.data.log, party, partyStats: stats, downs: R.downs || [] };
+        perMove: per, hitList: hits.filter(h => !h.minion).slice(0, 30).map(h => [h.mv, h.ph, h.dx, h.py, h.st, Math.round(h.dmg), (h.th || []).join(' ')]), moves, gaps, phases, rolls: R.rolls, jumps: R.jumps, fails: R.fails, attacks: R.attacks, heroDmg: Math.round(R.heroDmg), boxLog: bz.data.log, party, partyStats: stats, downs: R.downs || [] };
     }, LIM);
     if (res === 'more') { res = null; continue; }
     if (!res) await L.drain(p);

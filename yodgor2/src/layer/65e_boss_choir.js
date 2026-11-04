@@ -193,7 +193,8 @@
             const s = d.solo; s.t++;
             s.x = clamp(s.x + Math.sin(s.t * .02) * .4, a.x0 + 30, a.x1 - 30); d.part.x = s.x; d.part.y = s.y - 6;
             // the row keeps singing rings while the soloist holds
-            if (s.t % 90 === 30) rings(b, 0, [-1, 1], 2.6);
+            // (with the same 24-frame tell as every other ring: a hum and a frost flash on the row)
+            if (s.t % 90 === 30) { rings(b, 24, [-1, 1], 2.6); sfx('telegraph', { x: b.x, pitch: 1.5 }); G.FX.ring(b.x, a.floor - 2, 4, 26, ICE, 22, { width: 2 }); }
             if (s.hits >= 3) { endSolo(b, true); return 150; }
             if (s.t >= 420) { const x = s.x; endSolo(b, false); wall(b, x, 12, [-1, 1]); sfx('boss_roar', { x, pitch: 1.6, vol: .5 }); m.end = t; }
           }

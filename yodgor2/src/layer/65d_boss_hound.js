@@ -143,12 +143,13 @@
           }
           if (t < m.W) { b.vx *= .7; return false; }
           if (t < m.W + m.T - 14 && BM.okP(pl)) { m.tx += clamp(clamp(pl.x, a.x0 + 40, a.x1 - 40) - m.tx, -2, 2); m.mk.x = m.tx; m.th.box = BM.boxAt(m.tx, a.floor - 44, 88, 44); }
+          if (t === m.W + m.T - 14 && b.phase >= 3) { const f = Math.sign(m.tx - m.x0) || b.facing; waveThreat(b, m.tx + 20 * f, f, 3.4, 14); }
           if (t === m.W) { m.x0 = b.x; b.noGrav = true; sfx('whoosh', { x: b.x }); G.FX.dust(b.x, b.y, 8, 1.4); }
           if (t < m.W + m.T) { const u = (t - m.W) / m.T; b.x = lerp(m.x0, m.tx, u); b.y = a.floor - 130 * 4 * u * (1 - u); b.vx = 0; b.vy = 0; b.onGround = false; b.facing = Math.sign(m.tx - m.x0) || b.facing; return false; }
           if (t === m.W + m.T) {
             b.x = m.tx; b.y = a.floor; b.noGrav = false; b.onGround = true; d.landT = b.stateT;
             G.shake(.55); G.hitstop(4); sfx('stomp', { x: b.x }); G.FX.shockwave(b.x, a.floor, 54, { pal: 'gold' }); G.FX.dust(b.x, a.floor, 12, 2);
-            if (b.phase >= 3) { b.add(new KIT.Shockwave(b.x + 20 * b.facing, a.floor, b.facing, { pal: G.Art.FLAME_FIRE, color: '#ff8a2a', color2: '#c83a1a', dmg: .55 * b.dmg, spd: 3.4, h: 18, status: burn(b) })); waveThreat(b, b.x + 20 * b.facing, b.facing, 3.4, 0); }
+            if (b.phase >= 3) { b.add(new KIT.Shockwave(b.x + 20 * b.facing, a.floor, b.facing, { pal: G.Art.FLAME_FIRE, color: '#ff8a2a', color2: '#c83a1a', dmg: .55 * b.dmg, spd: 3.4, h: 18, status: burn(b) })); }
           }
           if (t >= m.W + m.T && t <= m.W + m.T + 4) BM.strike(b, BM.boxAt(b.x, a.floor - 44, 88, 44), { k: 1.1, kbx: 4, kby: -4, dir: Math.sign(pl.x - b.x) || 1, heavy: true }, m.hit || (m.hit = new Set()));
           return t >= m.W + m.T + 8;
@@ -236,13 +237,12 @@
           if (t === m.T[2]) { b.setState('bash'); sfx('swing_heavy', { x: b.x }); G.FX.smear && G.FX.smear({ owner: b, ox: 8, oy: -40, r0: 20, r1: 96, a0: -1.9, a1: 1, dir: b.facing, color: '#fff0c0', color2: '#ff6a1a', life: 10 }); }
           if (t >= m.T[2] && t <= m.T[2] + 5) BM.strike(b, BM.box(b, -24, -64, 112, 64), { k: .8, kbx: 4, kby: -3, status: burn(b) }, m.h2 || (m.h2 = new Set()));
           // the slam — it waits, then the fire runs along the ground
-          if (t === m.T[2] + 14) { b.setState('leap'); d.W = 999; d.landT = 0; }
+          if (t === m.T[2] + 14) { b.setState('leap'); d.W = 999; d.landT = 0; waveThreat(b, b.x + 50 * b.facing, b.facing, 3.6, m.T[3] - t); }
           if (t === m.T[3] - 8) sfx('telegraph', { x: b.x, pitch: 1.3 });
           if (t === m.T[3]) {
             b.setState('leap'); d.W = 0; d.landT = 0; b.data.landT = b.stateT;
             G.shake(.5); sfx('stomp', { x: b.x }); G.FX.shockwave(b.x + b.facing * 40, a.floor, 40, { pal: 'fire' });
             b.add(new KIT.Shockwave(b.x + 50 * b.facing, a.floor, b.facing, { pal: G.Art.FLAME_FIRE, color: '#ff8a2a', color2: '#c83a1a', dmg: .6 * b.dmg, spd: 3.6, h: 20, status: burn(b) }));
-            waveThreat(b, b.x + 50 * b.facing, b.facing, 3.6, 0);
           }
           if (t >= m.T[3] && t <= m.T[3] + 4) BM.strike(b, BM.box(b, 0, -50, 80, 50), { k: 1.1, kbx: 4, kby: -4.5, heavy: true, status: burn(b) }, m.h3 || (m.h3 = new Set()));
           return t >= m.T[3] + 12;
@@ -251,7 +251,7 @@
     const t0 = s => t(s);
     function waveThreat(b, x0, dir, spd, delay) {
       const pl = b.player; if (!BM.okP(pl)) return;
-      const dist = (pl.x - x0) * dir; if (dist < 0) return;
+      const dist = Math.max(0, (pl.x - x0) * dir);   // registered even when the hero is behind it now: he may step into its path
       BM.threat(b, { in: delay + Math.max(0, Math.round((dist - 12) / spd)), dur: 8, box: BM.boxAt(pl.x, A().floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd, t0: BM.now() + delay } });
     }
     // the shield takes the blows from the front while he guards; enough of them and it breaks: 3 s of reeling

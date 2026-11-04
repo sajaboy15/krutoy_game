@@ -28,9 +28,12 @@
     const headBox = b => ({ x: b.hx - 22, y: b.hy - 16, w: 44, h: 32 });
     const lob = (b, x0, y0, tx, u, o) => {
       const a = A(), g = .22, vx = (tx - x0) / u, vy = (a.floor - 3 - y0 - .5 * g * u * u) / u;
-      return b.add(new G.Projectile(Object.assign({ x: x0, y: y0, vx, vy, grav: g, r: 5, faction: 'enemy', owner: b, dmg: .55 * b.dmg, life: 220, color: FIRE, kbx: 2.5, kby: -3, status: burn(), light: { r: 70, color: '#ffb040', a: .8 }, trail: { color: '#ff8a2a', life: 14, size: 1, every: 1 }, info: { dmgColor: '#ffb040' },
+      const pr = b.add(new G.Projectile(Object.assign({ x: x0, y: y0, vx, vy, grav: g, r: 5, faction: 'enemy', owner: b, dmg: .55 * b.dmg, life: 220, color: FIRE, kbx: 2.5, kby: -3, status: burn(), light: { r: 70, color: '#ffb040', a: .8 }, trail: { color: '#ff8a2a', life: 14, size: 1, every: 1 }, info: { dmgColor: '#ffb040' },
         onWall: e => { if (!b.dead && b.mode !== 'dying') b.add(new KIT.FirePool(e.x, a.floor, { w: 30, life: 120, pal: G.Art.FLAME_FIRE, glowC: '#ff8a2a', dmg: .3 * b.dmg, status: burn() })); },
         onDie: e => G.FX.explosion(e.x, e.y - 2, { size: 's', pal: 'fire', shake: .06 }) }, o || {})));
+      // the ball itself burns on its way down: a threat that follows it (bots and companions see it like the hero does)
+      if (pr) BM.threat(b, { in: 0, dur: u, box: () => pr.dead ? null : { x: pr.x - 9, y: pr.y - 9, w: 18, h: 18 }, how: 'out' });
+      return pr;
     };
     const poolThreat = (b, x, inF) => BM.threat(b, { in: inF, dur: 120, box: { x: x - 18, y: A().floor - 14, w: 36, h: 14 }, how: 'out' });
 
@@ -111,6 +114,12 @@
           }
           if (m.st === 'aim') {
             if (k < m.W - 16 && BM.okP(pl)) { m.tx = lerp(m.tx, clamp(pl.x, a.x0 + 30, a.x1 - 30), .08); m.mk.x = m.tx; m.th.box = BM.boxAt(m.tx, a.floor - 60, 56, 60); }
+            if (k === m.W - 16) {
+              // the aim is locked: the time of the fall is known now (same steps as 'fall' below), so are the burning waves
+              let y = b.hy, v = 3, n = 0; while (y < a.floor - 18 && n < 90) { v = Math.min(13, v + .75); y += v; n++; }
+              const at = 16 + n; m.th.at = BM.now() + at; m.th.end = m.th.at + m.th.dur;
+              for (const dir of [-1, 1]) waveThreat(b, m.tx + 22 * dir, dir, 3 + .3 * b.phase, at);
+            }
             b.hx += .12 * (m.tx - b.hx); b.hy += .1 * (a.floor - 270 - b.hy); b.hs = 0; b.ha = angTo(b.ha, Math.PI / 2, .14); b.jaw = Math.min(.7, b.jaw + .05);
             if (k >= m.W) { m.st = 'fall'; m.t0 = t; m.v = 3; sfx('whoosh', { x: b.hx }); }
             return false;
@@ -121,7 +130,7 @@
               b.hy = a.floor - 18; m.st = 'stuck'; m.t0 = t; b.drape = true; m.lie = b.hx > a.cx ? Math.PI - .12 : .12; b.jaw = .8;
               G.shake(.85); G.hitstop(6); sfx('explosion', { x: b.hx }); sfx('stomp', { x: b.hx }); G.FX.explosion(b.hx, a.floor - 14, { size: 'l', pal: 'fire', shake: 0, debris: false });
               BM.strike(b, BM.boxAt(b.hx, a.floor - 60, 56, 60), { k: 1.1, kbx: 4, kby: -5, dir: Math.sign(pl.x - b.hx) || 1, status: burn(), heavy: true }, new Set());
-              for (const dir of [-1, 1]) { const x0 = b.hx + 22 * dir; b.add(new KIT.Shockwave(x0, a.floor, dir, { pal: G.Art.FLAME_FIRE, color: FIRE, color2: '#c83a1a', dust: '#6a4a3a', dmg: .55 * b.dmg, spd: 3 + .3 * b.phase, h: 20, status: burn() })); waveThreat(b, x0, dir, 3 + .3 * b.phase, 0); }
+              for (const dir of [-1, 1]) { const x0 = b.hx + 22 * dir; b.add(new KIT.Shockwave(x0, a.floor, dir, { pal: G.Art.FLAME_FIRE, color: FIRE, color2: '#c83a1a', dust: '#6a4a3a', dmg: .55 * b.dmg, spd: 3 + .3 * b.phase, h: 20, status: burn() })); }
             }
             return false;
           }
@@ -213,7 +222,7 @@
     const t2 = () => BM.now();
     function waveThreat(b, x0, dir, spd, delay) {
       const pl = b.player; if (!BM.okP(pl)) return;
-      const dist = (pl.x - x0) * dir; if (dist < 0) return;
+      const dist = Math.max(0, (pl.x - x0) * dir);   // registered even when the hero is behind it now: he may step into its path
       BM.threat(b, { in: delay + Math.max(0, Math.round((dist - 12) / spd)), dur: 8, box: BM.boxAt(pl.x, A().floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd, t0: BM.now() + delay } });
     }
     // the bite: rise to the side, a red aim line, the lunge (phase 2: sometimes the line locks and he waits)
@@ -273,7 +282,8 @@
 
     BM.install('aidahar', {
       moves, rest: [56, 46, 36], moteColor: '#ffd76e',
-      def0: { hp: 1000, dmg: 20 },
+      // 8a: 1000 -> 760. Much of his time is spent out of a blade's reach; at 1000 the pure-damage floor was 128 s (others 25-55 s)
+      def0: { hp: 760, dmg: 20 },
       setup(b) { delete b.pick; delete b.rest; delete b.tele; b.contact = 0; },
       tick(b) {
         const d = b.data;

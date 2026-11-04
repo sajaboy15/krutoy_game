@@ -129,6 +129,8 @@
           if (t < m.W) { b.vx *= .7; return false; }
           const lock = m.W + m.T - 16;                     // the shadow stops following 16 frames before the fall
           if (t < lock && BM.okP(pl)) { m.tx += clamp(clamp(pl.x, a.x0 + 40, a.x1 - 40) - m.tx, -2.4, 2.4); m.mk.x = m.tx; m.th.box = BM.boxAt(m.tx, a.floor - 34, 80, 34); }
+          // phase 2: the landing also cracks the floor both ways; the waves are known as soon as the shadow stops
+          if (t === lock && b.phase >= 2) for (const dir of [-1, 1]) crackThreat(b, m.tx + 30 * dir, dir, 2.6, m.W + m.T - t);
           if (t === m.W) { m.x0 = b.x; b.noGrav = true; sfx('whoosh', { x: b.x }); G.FX.dust(b.x, a.floor, 10, 1.6); }
           if (t >= m.W && t < m.W + m.T) {
             const u = (t - m.W) / m.T; b.x = lerp(m.x0, m.tx, ease(u)); b.y = a.floor - 150 * 4 * u * (1 - u); b.vx = 0; b.vy = 0; b.onGround = false;
@@ -141,7 +143,6 @@
             G.FX.shockwave(b.x, a.floor, 60, { pal: 'gold' }); G.FX.dust(b.x, a.floor, 16, 2.2);
             if (b.phase >= 2) for (const dir of [-1, 1]) {
               b.add(new KIT.Shockwave(b.x + 30 * dir, a.floor, dir, { pal: G.Art.FLAME_GOLD, color: GOLD, dmg: .55 * b.dmg, spd: 2.6, life: 90 }));
-              crackThreat(b, b.x + 30 * dir, dir, 2.6, 0);
             }
           }
           if (t >= m.W + m.T && t <= m.W + m.T + 4) BM.strike(b, BM.boxAt(b.x, a.floor - 34, 80, 34), { k: 1, kbx: 4, kby: -4, dir: Math.sign(pl.x - b.x) || 1, heavy: true }, m.hit || (m.hit = new Set()));
@@ -262,7 +263,7 @@
     // when a crack (shockwave from x0 moving dir at spd, starting in `delay` frames) reaches the hero
     function crackThreat(b, x0, dir, spd, delay) {
       const pl = b.player; if (!BM.okP(pl)) return;
-      const dist = (pl.x - x0) * dir; if (dist < 0) return;
+      const dist = Math.max(0, (pl.x - x0) * dir);   // registered even when the hero is behind it now: he may step into its path
       const at = delay + Math.max(0, Math.round((dist - 12) / spd));
       BM.threat(b, { in: at, dur: Math.ceil(20 / spd) + 2, box: BM.boxAt(pl.x, A().floor - 18, 26, 18), how: 'jump', wave: { x0, dir, spd, t0: BM.now() + delay } });
     }

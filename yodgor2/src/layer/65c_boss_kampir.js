@@ -165,6 +165,8 @@
             BM.mark(b, m.tx, 76, m.W + m.T + 4, GREEN, { hgt: 34 });
             BM.threat(b, { in: m.W + m.T, dur: 5, box: BM.boxAt(m.tx, a.floor - 50, 76, 50), how: 'out' });
             for (const h of live(b)) { h.st = 'rear'; h.t = 0; }
+            // the landing point never moves, so the poisoned waves are known from the start
+            for (const dir of [-1, 1]) waveThreat(b, m.tx + 18 * dir, dir, 3.2, m.W + m.T);
           }
           if (t < m.W) { b.vx *= .8; return false; }
           if (t === m.W) { m.x0 = b.x; b.noGrav = true; sfx('whoosh', { x: b.x }); G.FX.dust(b.x, b.y, 8, 1.4); b.facing = Math.sign(m.tx - b.x) || b.facing; }
@@ -175,7 +177,6 @@
             G.FX.flashRing(b.x, a.floor - 1, 50, { pal: 'witch', flat: true, rate: 3 }); G.FX.magicBurst(b.x, a.floor - 8, 'witch', { size: 's' });
             for (const dir of [-1, 1]) {
               b.add(new KIT.Shockwave(b.x + 18 * dir, a.floor, dir, { pal: G.Art.FLAME_WITCH, color: '#8dff6a', color2: '#2a8a3a', dust: '#6a5a40', dmg: .6 * b.dmg, spd: 3.2, h: 20, status: poison() }));
-              waveThreat(b, b.x + 18 * dir, dir, 3.2, 0);
             }
             for (const h of live(b)) { h.st = 'droop'; h.t = 0; }
           }
@@ -200,7 +201,7 @@
     const t0 = s => t(s);
     function waveThreat(b, x0, dir, spd, delay) {
       const pl = b.player; if (!BM.okP(pl)) return;
-      const dist = (pl.x - x0) * dir; if (dist < 0) return;
+      const dist = Math.max(0, (pl.x - x0) * dir);   // registered even when the hero is behind it now: he may step into its path
       BM.threat(b, { in: delay + Math.max(0, Math.round((dist - 12) / spd)), dur: 8, box: BM.boxAt(pl.x, A().floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd, t0: BM.now() + delay } });
     }
     // phase 3: four heads cut away for good (the ones knocked down most)

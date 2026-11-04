@@ -40,7 +40,7 @@
       b.data.q = b.data.q || [];
       b.data.q.push({ at: BM.now() + delay, fn: () => b.add(new KIT.Shockwave(x0, A().floor, dir, { dmg: (o.k || .55) * b.dmg, spd, life: 300, h: o.h || 16, color, owner: b, pal: G.Art.FLAME_SPIRIT || G.Art.FLAME_ICE })) });
       const pl = b.player; if (!BM.okP(pl)) return;
-      const dist = (pl.x - x0) * dir; if (dist < 0) return;
+      const dist = Math.max(0, (pl.x - x0) * dir);   // registered even when the hero is behind it now: he may step into its path
       BM.threat(b, { in: delay + Math.max(0, Math.round((dist - 12) / spd)), dur: Math.ceil(20 / spd) + 2, box: BM.boxAt(pl.x, A().floor - 18, 26, 18), how: 'jump' });
     };
     // run queued spawns (waves etc.) in tick

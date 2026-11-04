@@ -51,9 +51,7 @@ Roadmap = GDD chapter 26. Progress ≈ 62%. Review sheets for all rewritten text
 - **Stage 6, factions.** 75_factions, 76/77/78 arcs (18 quests), 79_economy_crime, faction bosses 65s_shirin / 65t_humo / 65u_oydin; test/s6_*.js. Reputation, double play, journal [N], merchants and haggling, stealth and crime.
 - **Stage 7a, companion systems.** 86_party, 87_party_ai, 88_party_ui; test/s7_*.js. Alp / Nargiza / Surayyo in combat, approval, stances [V], orders 1/2/3, downed/revive, branches. Debug: `?stage=N&god&party=alp,nargiza,surayyo`.
 
-**IN PROGRESS (interrupted by a rate limit)**
-- **Stage 8a, Souls-like boss movesets** for Glutton, Kampir, Hound, Choir, Albasty, Ak Bars, Ajdaho. Files 65a–65g; 65a provides the shared moveset runner `G.BM`, which the faction bosses use.
-  - Audit what exists, finish, and verify each boss: all moves fire, a dodge bot can take zero damage, kill time by weapon category, a full party does not trivialise the fight.
+- **Stage 8a, Souls-like boss movesets** (65a kit `G.BM` + 65b–65h). Every move fires (test/s8_moves.js); waves are telegraphed from the windup; companions read `G.BM` threats; Ajdaho hp 760. Results and open points: notes/stage8a_bosses.md.
 
 **TOP PRIORITY NEXT (the author's complaint)**
 - **Regions look empty.** Many are sparse or too dark: Swallowed Streets, Heart, Salt Mines, Tower of Silence, Rabat.

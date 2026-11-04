@@ -209,7 +209,7 @@
         try {
           if (r && pl.hp < hp0) {
             const boss = src.isBoss ? src : src._boss || (src.owner && src.owner.isBoss ? src.owner : null) || (src.bossOwner || null);
-            if (boss && boss.def && BM.specs[boss.def.id]) BM.hits.push({ t: now(), id: boss.def.id, mv: src._mv || boss.data.mv || boss.data.recMv || boss.state, dmg: hp0 - pl.hp, ph: boss.phase, minion: !!src.bossOwner, py: Math.round(boss.y - pl.y), dx: Math.round(pl.x - boss.x), st: pl.state + (pl.act ? ':act' : '') + (pl.onGround ? '' : ':air') });
+            if (boss && boss.def && BM.specs[boss.def.id]) BM.hits.push({ t: now(), id: boss.def.id, mv: src._mv || boss.data.mv || boss.data.recMv || boss.state, dmg: hp0 - pl.hp, ph: boss.phase, minion: !!src.bossOwner, py: Math.round(boss.y - pl.y), dx: Math.round(pl.x - boss.x), st: pl.state + (pl.act ? ':act' : '') + (pl.onGround ? '' : ':air'), th: BM.threats.filter(q => q.id === boss.def.id && q.end >= now() - 4).map(q => q.mv + '/' + q.how + '/lead' + (q.at - q.seen) + '/in' + (q.at - now())).slice(-4) });
             if (BM.hits.length > 4000) BM.hits.splice(0, 1500);
           }
         } catch (e) { /* ignore */ }

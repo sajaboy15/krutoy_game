@@ -475,6 +475,28 @@
         PX.dodges = (PX.dodges || 0) + 1;
         return true;
       }
+      // 8a: the redesigned bosses announce their strikes (G.BM threats: a box and a moment). A companion who notices one
+      // (not always: about two times in three) steps out of it. Hall-wide strikes and travelling waves are left alone.
+      const BMx = G.BM, now = G.world.t;
+      if (BMx && BMx.live && G.Game.boss) for (const th of BMx.live()) {
+        if (th.wave) continue;
+        let left = th.at - now;
+        if (th.dyn) { try { left = th.dyn(this); } catch (e) { left = null; } if (left === null || left === undefined) continue; }
+        if (left > 28 || left < -th.dur) continue;
+        const seen = th._cs || (th._cs = {});
+        if (seen[this.id] === undefined) seen[this.id] = Math.random() < 0.65;
+        if (!seen[this.id]) continue;
+        // a low sweep along the floor: hop it at the last moment
+        if (th.how === 'jump') { if (left <= 5 && left >= 0 && this.onGround) { this.hop(34, 0, this.vx); PX.dodges = (PX.dodges || 0) + 1; return true; } continue; }
+        let bx = null; try { bx = typeof th.box === 'function' ? th.box() : th.box; } catch (e) { bx = null; }
+        if (!bx || bx.w > 200 || x1 < bx.x || x0 > bx.x + bx.w || this.y < bx.y - 2 || this.y - this.h > bx.y + bx.h) continue;
+        const toL = this.x - bx.x, toR = bx.x + bx.w - this.x;
+        const dir = Math.abs(toL - toR) < 10 ? (sgn(p.x - this.x) || 1) : toL < toR ? -1 : 1;
+        if (this.busy() && this.state !== 'skill') this.setState('follow');
+        this.dodgeDir = dir; this.dodgeT = Math.min(40, Math.ceil(((dir < 0 ? toL : toR) + this.w) / (this.def.speed * 1.2)) + 4);
+        PX.dodges = (PX.dodges || 0) + 1;
+        return true;
+      }
       return false;
     }
     busy() { return ['atk', 'atk2', 'slam', 'trip', 'jab', 'spin', 'cast', 'sing', 'skill', 'pour', 'hook', 'taunt', 'block', 'throw', 'ram'].includes(this.state); }
