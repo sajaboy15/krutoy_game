@@ -112,7 +112,11 @@
           if (m.st === 'aim') {
             if (k < m.W - 16 && BM.okP(pl)) { m.tx = lerp(m.tx, clamp(pl.x, a.x0 + 30, a.x1 - 30), .08); m.mk.x = m.tx; m.th.box = BM.boxAt(m.tx, a.floor - 60, 56, 60); }
             b.hx += .12 * (m.tx - b.hx); b.hy += .1 * (a.floor - 270 - b.hy); b.hs = 0; b.ha = angTo(b.ha, Math.PI / 2, .14); b.jaw = Math.min(.7, b.jaw + .05);
-            if (k >= m.W) { m.st = 'fall'; m.t0 = t; m.v = 3; sfx('whoosh', { x: b.hx }); }
+            if (k >= m.W) {
+              m.st = 'fall'; m.t0 = t; m.v = 3; sfx('whoosh', { x: b.hx });
+              // the fall takes ~24 frames; the fire leaves the crater 8 frames after it
+              m.wth = [-1, 1].map(dir => waveThreat(b, m.tx + 22 * dir, dir, 3 + .3 * b.phase, 32)).filter(Boolean);
+            }
             return false;
           }
           if (m.st === 'fall') {
@@ -121,10 +125,17 @@
               b.hy = a.floor - 18; m.st = 'stuck'; m.t0 = t; b.drape = true; m.lie = b.hx > a.cx ? Math.PI - .12 : .12; b.jaw = .8;
               G.shake(.85); G.hitstop(6); sfx('explosion', { x: b.hx }); sfx('stomp', { x: b.hx }); G.FX.explosion(b.hx, a.floor - 14, { size: 'l', pal: 'fire', shake: 0, debris: false });
               BM.strike(b, BM.boxAt(b.hx, a.floor - 60, 56, 60), { k: 1.1, kbx: 4, kby: -5, dir: Math.sign(pl.x - b.hx) || 1, status: burn(), heavy: true }, new Set());
-              for (const dir of [-1, 1]) { const x0 = b.hx + 22 * dir; b.add(new KIT.Shockwave(x0, a.floor, dir, { pal: G.Art.FLAME_FIRE, color: FIRE, color2: '#c83a1a', dust: '#6a4a3a', dmg: .55 * b.dmg, spd: 3 + .3 * b.phase, h: 20, status: burn() })); waveThreat(b, x0, dir, 3 + .3 * b.phase, 0); }
+              m.waveAt = t + 8;
+              for (const th of m.wth || []) { th.wave.t0 = BM.now() + 8; th.wave.x0 = b.hx + 22 * th.wave.dir; }
+              G.FX.flashRing && G.FX.flashRing(b.hx, a.floor, 40, { pal: 'gold', flat: true, rate: 2 });
             }
             return false;
           }
+          if (m.waveAt && t === m.waveAt) {
+            m.waveAt = 0;
+            for (const dir of [-1, 1]) { const x0 = b.hx + 22 * dir; b.add(new KIT.Shockwave(x0, a.floor, dir, { pal: G.Art.FLAME_FIRE, color: FIRE, color2: '#c83a1a', dust: '#6a4a3a', dmg: .55 * b.dmg, spd: 3 + .3 * b.phase, h: 20, status: burn() })); }
+          }
+          if (m.waveAt) return false;
           // stuck in the ground: the window is the move's open time
           return true;
         } },
@@ -214,7 +225,7 @@
     function waveThreat(b, x0, dir, spd, delay) {
       const pl = b.player; if (!BM.okP(pl)) return;
       const dist = (pl.x - x0) * dir; if (dist < 0) return;
-      BM.threat(b, { in: delay + Math.max(0, Math.round((dist - 12) / spd)), dur: 8, box: BM.boxAt(pl.x, A().floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd, t0: BM.now() + delay } });
+      return BM.threat(b, { in: delay + Math.max(0, Math.round((dist - 12) / spd)), dur: 8, box: BM.boxAt(pl.x, A().floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd, t0: BM.now() + delay } });
     }
     // the bite: rise to the side, a red aim line, the lunge (phase 2: sometimes the line locks and he waits)
     function biteRun(b, t, m, delay) {
@@ -273,7 +284,7 @@
 
     BM.install('aidahar', {
       moves, rest: [56, 46, 36], moteColor: '#ffd76e',
-      def0: { hp: 1000, dmg: 20 },
+      def0: { hp: 720, dmg: 20 },   // the head is in reach far less often than any other boss: fewer hp, same moveset (no damage sponge)
       setup(b) { delete b.pick; delete b.rest; delete b.tele; b.contact = 0; },
       tick(b) {
         const d = b.data;

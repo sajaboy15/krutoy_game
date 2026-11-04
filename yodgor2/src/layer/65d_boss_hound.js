@@ -88,7 +88,7 @@
             const end = m.dir > 0 ? a.x1 - 30 : a.x0 + 30;
             BM.mark(b, (b.x + end) / 2, Math.abs(end - b.x), m.W + 4, GOLD, { hgt: 14 });
             const dist = Math.abs(pl.x - b.x);
-            BM.threat(b, { in: m.W + Math.max(0, Math.round((dist - 30) / 7)), dur: 8, box: () => BM.boxAt(b.x, b.y - 62, 70, 62), how: 'roll' });
+            BM.threat(b, { in: m.W + Math.max(0, Math.floor((dist - 46) / 7)), dur: 8, box: () => BM.boxAt(b.x, b.y - 62, 70, 62), how: 'roll', noWalk: true });
             m.hit = new Set(); m.stop = null;
           }
           if (t < m.W) { b.vx *= .7; return false; }
@@ -165,7 +165,7 @@
             for (const x of xs) {
               const x0 = b.x + b.facing * 10, y0 = b.y - 80, u = 44, vx = (x - x0) / u, g = .18, vy = (a.floor - 4 - y0 - .5 * g * u * u) / u;
               b.add(new G.Projectile({ x: x0, y: y0, vx, vy, grav: g, r: 3, faction: 'enemy', owner: b, dmg: .3 * b.dmg, life: 120, color: '#ffe060', kbx: 1.5, kby: -2, trail: { color: '#ffb020', life: 8, size: 1, every: 2 }, light: { r: 26, color: '#ffd040', a: .6 }, onWall: e => { d.coins = d.coins || []; d.coins.push({ x: e.x, t: 0 }); G.FX.sparks(e.x, a.floor - 2, 3, 0, { color: '#fff4c0', color2: '#ffb020' }); } }));
-              BM.threat(b, { in: u, dur: 3, box: { x: x - 7, y: a.floor - 14, w: 14, h: 14 }, how: 'out' });
+              { const sw = Math.max(14, Math.abs(vx) * 9 + 14), bx0 = vx > 0 ? x + 7 - sw : x - 7; BM.threat(b, { in: u - 9, dur: 12, box: { x: bx0, y: a.floor - 36, w: sw, h: 36 }, how: 'out' }); }
               m.coins.push(x);
             }
             // the companions run after the gold

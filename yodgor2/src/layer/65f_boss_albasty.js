@@ -152,15 +152,16 @@
       tide: { ph: 2, w: [0, 2.5, 0], until: 2, open: [0, 40, 0],
         run(b, t, m) {
           const a = A(), d = b.data;
-          if (t === 1) { m.W = b.tele(26); d.W = m.W; b.setState('tide'); }
+          if (t === 1) {
+            m.W = b.tele(26); d.W = m.W; b.setState('tide'); m.x = clamp(b.x, a.x0 + 30, a.x1 - 30);
+            for (const dir of [-1, 1]) {
+              const x0 = m.x + 14 * dir, pl = b.player, dist = BM.okP(pl) ? (pl.x - x0) * dir : -1;
+              if (dist >= -12) BM.threat(b, { in: m.W + Math.max(0, Math.round((dist - 12) / 2.6)), dur: 8, box: BM.boxAt(pl.x, a.floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd: 2.6, t0: BM.now() + m.W } });
+            }
+          }
           if (t === m.W) {
             G.shake(.4); sfx('splash', { x: b.x });
-            for (const dir of [-1, 1]) {
-              const x0 = clamp(b.x, a.x0 + 30, a.x1 - 30) + 14 * dir;
-              b.add(new KIT.Shockwave(x0, a.floor, dir, { pal: G.Art.FLAME_SPIRIT, color: TEAL, dmg: .55 * b.dmg, spd: 2.6, status: { slow: { t: 60 } } }));
-              const pl = b.player, dist = BM.okP(pl) ? (pl.x - x0) * dir : -1;
-              if (dist >= 0) BM.threat(b, { in: Math.round((dist - 12) / 2.6), dur: 8, box: BM.boxAt(pl.x, a.floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd: 2.6, t0: BM.now() } });
-            }
+            for (const dir of [-1, 1]) b.add(new KIT.Shockwave(m.x + 14 * dir, a.floor, dir, { pal: G.Art.FLAME_SPIRIT, color: TEAL, dmg: .55 * b.dmg, spd: 2.6, status: { slow: { t: 60 } } }));
           }
           b.vx *= .85; if (b.fly) b.vy *= .85;
           return t >= m.W + 30;
@@ -174,7 +175,7 @@
             m.W = b.tele(26); b.setState('crawl'); b.vx = 0;
             const len = Math.min(220, Math.abs(pl.x - b.x) + 70);
             BM.hint(b, b.x + m.dir * len / 2, len, m.W + 4, '#ff6a3a', m.dir);
-            m.th = BM.threat(b, { in: m.W + Math.max(0, Math.round((Math.abs(pl.x - b.x) - 30) / 7)), dur: 7, box: () => BM.boxAt(b.x, a.floor - 34, 60, 34), how: 'any' });
+            m.th = BM.threat(b, { in: m.W + Math.max(0, Math.round((Math.abs(pl.x - b.x) - 30) / 7)), dur: 7, box: () => BM.boxAt(b.x, a.floor - 34, 60, 34), how: 'any', noWalk: true });
             m.hit = new Set(); m.len = len;
           }
           if (t < m.W) { b.vx *= .7; return false; }

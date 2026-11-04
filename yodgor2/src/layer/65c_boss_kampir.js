@@ -46,7 +46,9 @@
       h.st = 'spit'; h.t = -delay; h.wind = 999;                   // the head rears (pose); we fire ourselves
       const u = 40, at = delay + 1 + u;
       BM.mark(b, tx, 30, at + 2, GREEN, { hgt: 18 });
-      BM.threat(b, { in: at, dur: 100, box: { x: tx - 16, y: a.floor - 14, w: 32, h: 14 }, how: 'out' });
+      { const sw = Math.min(140, Math.abs(h.x - tx) * .3) + 32, bx0 = h.x > tx ? tx - 16 : tx + 16 - sw;
+        BM.threat(b, { in: at - 10, dur: 12, box: { x: bx0, y: a.floor - 40, w: sw, h: 40 }, how: 'out' });
+        BM.threat(b, { in: at, dur: 100, box: { x: tx - 16, y: a.floor - 14, w: 32, h: 14 }, how: 'out' }); }
       h.spit = { at: delay, tx };
     }
     function fireSpit(b, h) {

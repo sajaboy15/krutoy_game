@@ -81,7 +81,7 @@
         b.data.q = b.data.q || [];
         b.data.q.push({ at: BM.now() + delay, fn: () => tag(b.add(new Ring(x0, a.floor, dir, { dmg: .55 * b.dmg, spd, life: 300, h: 18, color: ICE, owner: b, pal: G.Art.FLAME_ICE || G.Art.FLAME_SPIRIT }))) });
         const pl = b.player; if (!BM.okP(pl)) continue;
-        const dist = (pl.x - x0) * dir; if (dist < -10) continue;
+        const dist = (pl.x - x0) * dir;
         BM.threat(b, { in: delay + Math.max(0, Math.round((dist - 12) / spd)), dur: 8, box: BM.boxAt(pl.x, a.floor - 20, 26, 20), how: 'jump', wave: { x0, dir, spd, t0: BM.now() + delay } });
       }
     }
@@ -155,7 +155,7 @@
             b.facePlayer(); m.W = b.tele(24); b.setState('cast_ice');
             m.cx = clamp(pl.x, a.x0 + 60, a.x1 - 60); m.cy = a.floor - 22; m.R0 = 120; m.T = 110; m.gap = Math.random() * Math.PI * 2;
             m.th = BM.threat(b, { in: m.W + m.T, dur: 200, box: () => { const r = ringR(m, BM.now()); return BM.boxAt(m.cx, a.floor - 60, 2 * r + 20, 60); }, how: 'roll' });
-            m.th.dyn = p => { const dd = Math.abs(p.x - m.cx), now = BM.now(); if (now < m.t0) return null; const r = ringR(m, now); if (r < dd - 6) return null; return Math.max(0, Math.round((r - dd) / (m.R0 / m.T))); };
+            m.th.dyn = p => { const dd = Math.abs(p.x - m.cx), now = BM.now(); if (now < m.t0) return null; const r = ringR(m, now); if (r + 4 < dd - 6) return null; return Math.max(0, Math.floor((r - (dd + 11) / .9) / (m.R0 / m.T))); };
           }
           if (t === m.W) { m.t0 = BM.now(); d.glyph = m; sfx('magic', { x: m.cx }); m.hit = new Set(); }
           if (t >= m.W) {

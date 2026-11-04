@@ -30,6 +30,7 @@
     BM.threat = (b, o) => {
       const th = Object.assign({ id: b.def.id, mv: b.data.mv, dur: 6, how: 'roll' }, o);
       th.seen = now(); th.at = th.seen + (o.in || 0); th.end = th.at + th.dur;
+      if (th.wave) th.end = Math.max(th.end, th.wave.t0 + (o.waveLife || 300));
       BM.threats.push(th);
       if (BM.threats.length > 64) { const t0 = now(); BM.threats = BM.threats.filter(q => q.end >= t0 - 2); }
       return th;
@@ -209,7 +210,7 @@
         try {
           if (r && pl.hp < hp0) {
             const boss = src.isBoss ? src : src._boss || (src.owner && src.owner.isBoss ? src.owner : null) || (src.bossOwner || null);
-            if (boss && boss.def && BM.specs[boss.def.id]) BM.hits.push({ t: now(), id: boss.def.id, mv: src._mv || boss.data.mv || boss.data.recMv || boss.state, dmg: hp0 - pl.hp, ph: boss.phase, minion: !!src.bossOwner, py: Math.round(boss.y - pl.y), dx: Math.round(pl.x - boss.x), st: pl.state + (pl.act ? ':act' : '') + (pl.onGround ? '' : ':air') });
+            if (boss && boss.def && BM.specs[boss.def.id]) BM.hits.push({ t: now(), id: boss.def.id, src: src === boss ? 'boss' : (src.constructor && src.constructor.name) || '?', mv: src._mv || boss.data.mv || boss.data.recMv || boss.state, dmg: hp0 - pl.hp, ph: boss.phase, minion: !!src.bossOwner || (src !== boss && !src.isBossPart && src.maxHp > 0 && src.kind === 'enemy'), py: Math.round(boss.y - pl.y), dx: Math.round(pl.x - boss.x), st: pl.state + (pl.act ? ':act' : '') + (pl.onGround ? '' : ':air') });
             if (BM.hits.length > 4000) BM.hits.splice(0, 1500);
           }
         } catch (e) { /* ignore */ }

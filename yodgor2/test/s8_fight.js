@@ -20,6 +20,7 @@ fs.mkdirSync(LOGS, { recursive: true });
     if (mv) for (const k in S.moves) if (k !== mv) S.moves[k].ok = () => false; else { S.moves[k].cd = 0; S.moves[k].range = null; S.moves[k].ok = null; S.moves[k].ph = 1; S.moves[k].until = 0; }
     bz.def.phaseAt = [0.0001, 0.00005]; bz.phaseAt = [-1, -1];
   }, [process.env.S8_FORCE || '', +(process.env.S8_PH || 1)]);
+  if (process.env.S8_TRACE) await p.evaluate(() => { window.__S8TRACE = 1; });
   await p.evaluate(([mode, cat]) => {
     const pl = G.world.player, BM = G.BM, bz = G.Game.boss;
     const R = window.__R = { mode, t0: G.world.t, hits0: BM.hits.length, log0: BM.log.length, rolls: 0, jumps: 0, fails: 0, flasks: 0, heroDmg: 0, attacks: 0, heroHp: pl.maxHp, bossHp: Math.round(bz.maxHp), bossDmg: +bz.dmg.toFixed(1) };
@@ -45,6 +46,7 @@ fs.mkdirSync(LOGS, { recursive: true });
       for (const th of BM.live()) {
         let s = seen.get(th);
         if (!s) { s = { at: th.seen + P.react[0] + Math.random() * (P.react[1] - P.react[0]), ok: Math.random() < P.ok * (th.feint && mode === 'avg' ? 0.8 : 1), done: false }; seen.set(th, s); }
+        if (th.dyn) s.done = false;
         if (now < s.at || s.done) continue;
         const bx = boxOf(th); if (!bx) continue;
         const pb = pl.box();
@@ -102,10 +104,18 @@ fs.mkdirSync(LOGS, { recursive: true });
         const stam = G.CH && G.CH.st ? G.CH.st.v : 100;
         if (mode === 'god') G.CH.st.v = Math.max(stam, 30);
         if (B.hold > 0) { inp.keys.add('KeyJ'); B.hold--; }
-        else { inp.keys.delete('KeyJ'); if (!pl.act && Math.abs(want - pl.x) < 30 && Math.abs(tg.cy - pl.cy) < 70 && (mode === 'god' || stam > 45) && G.frame % 3 === 0) { B.n++; B.hold = 2; R.attacks++; } }
+        else { inp.keys.delete('KeyJ'); if (!pl.act && Math.abs(want - pl.x) < 30 && Math.abs(tg.cy - pl.cy) < 70 && (mode === 'god' || stam > (mode === 'perfect' ? 62 : 45)) && G.frame % 3 === 0) { B.n++; B.hold = 2; R.attacks++; } }
       } else { inp.keys.delete('KeyJ'); B.hold = 0; }
+      if (R.trace) {
+        const pb = pl.box();
+        R.ring.push([now - R.t0, Math.round(pl.x), Math.round(pl.y), pl.state + (pl.onGround ? '' : '^'), (inp.down.left ? 'L' : '') + (inp.down.right ? 'R' : '') + (inp.lastPress.roll === G.frame ? 'roll' : '') + (inp.lastPress.jump === G.frame ? 'jump' : ''),
+          U.map(u => u.th.mv + ':' + u.th.how + ':' + u.left + (u.s.ok ? '' : '!') + (u.s.done ? 'd' : '') + ':' + Math.round(u.bx.x) + '+' + Math.round(u.bx.w)).join(' '), Math.round(G.Game.boss ? G.Game.boss.x : 0)]);
+        if (R.ring.length > 24) R.ring.shift();
+        if (BM.hits.length > R.nh) { for (let i = R.nh; i < BM.hits.length; i++) if (R.traces.length < 12) R.traces.push({ hit: BM.hits[i].mv + ' ' + BM.hits[i].src + ' dmg' + Math.round(BM.hits[i].dmg), near: G.world.ents.filter(e => e && Math.abs(e.x - pl.x) < 60).map(e => (e.constructor && e.constructor.name) + '@' + Math.round(e.x - pl.x) + ',' + Math.round((e.y || 0) - pl.y) + (e._mv ? ':' + e._mv : '')).slice(0, 8).join(' ') + ' | live ' + BM.threats.filter(q => q.end >= now - 30).map(q => q.mv + ':' + q.how + ':' + (q.at - now) + '/' + (q.end - now) + (q.wave ? ':w' + Math.round(q.wave.x0 - pl.x) + 'd' + q.wave.dir + 't' + (q.wave.t0 - now) : '')).join(' ') + ' | sw ' + G.world.ents.filter(e => e instanceof G.BossKit.Shockwave).map(e => Math.round(e.x - pl.x) + 'd' + e.dir + 'y' + Math.round(e.y - pl.y)).join(' '), ring: R.ring.slice() }); R.nh = BM.hits.length; }
+      }
       return up0.apply(this, arguments);
     };
+    R.trace = !!window.__S8TRACE; R.ring = []; R.traces = []; R.nh = BM.hits.length;
     const T0 = R.T0 = G.Boss.prototype.takeHit;
     G.Boss.prototype.takeHit = function (h) { const before = this.hp; const ok = T0.apply(this, arguments); if (ok && h && h.src === pl) R.heroDmg += before - this.hp; return ok; };
   }, [mode, cat]);
@@ -136,7 +146,7 @@ fs.mkdirSync(LOGS, { recursive: true });
       const stats = G.PARTY && G.PARTY.stats ? { boss: G.PARTY.stats.boss, taken: G.PARTY.stats.taken } : null;
       return { killed: !!(bz.dead || bz.mode === 'dying' || G.Game.stage.cleared), secs: +((G.world.t - R.t0) / 60).toFixed(1), hpLeft: +(Math.max(0, bz.hp) / bz.maxHp).toFixed(3), phase: bz.phase,
         bossHp: R.bossHp, bossDmg: R.bossDmg, heroHp: R.heroHp, hitsTaken: hits.filter(h => !h.minion).length, dmgTaken: Math.round(hits.filter(h => !h.minion).reduce((s, h) => s + h.dmg, 0)), minionHits: hits.filter(h => h.minion).length,
-        perMove: per, hitList: hits.filter(h => !h.minion).slice(0, 30).map(h => [h.mv, h.ph, h.dx, h.py, h.st, Math.round(h.dmg)]), moves, gaps, phases, rolls: R.rolls, jumps: R.jumps, fails: R.fails, attacks: R.attacks, heroDmg: Math.round(R.heroDmg), boxLog: bz.data.log, party, partyStats: stats, downs: R.downs || [] };
+        perMove: per, hitList: hits.filter(h => !h.minion).slice(0, 30).map(h => [h.mv, h.ph, h.dx, h.py, h.st, Math.round(h.dmg)]), moves, gaps, phases, rolls: R.rolls, jumps: R.jumps, fails: R.fails, attacks: R.attacks, heroDmg: Math.round(R.heroDmg), boxLog: bz.data.log, party, partyStats: stats, downs: R.downs || [], traces: R.traces };
     }, LIM);
     if (res === 'more') { res = null; continue; }
     if (!res) await L.drain(p);
