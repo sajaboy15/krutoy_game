@@ -4,7 +4,7 @@
    except Ajdaho's (65h: its head is rarely in reach). */
 {
   // measured 4 Nov: 3 average-bot runs per boss pooled (one run is far too noisy); see notes/s8_results.md
-  const TUNE = { glutton: 1.4, kempir: 1.55, hound: .9, choir: 1.1, albasty: 1.6, barys: 1.35, aidahar: 1.4 };
+  const TUNE = { glutton: 1.4, kempir: 1.8, hound: .9, choir: 1.1, albasty: 1.6, barys: 1.35, aidahar: 1.3 };
   // Kampir and Albasty land too few blows for damage alone to matter: they rest less between strings (tempo, not numbers)
   const REST = { kempir: [32, 26, 22], albasty: [32, 26, 22] };
   if (G.BM && G.BM.specs) for (const id in TUNE) { const s = G.BM.specs[id]; if (!s) { console.warn('[tune] no boss', id); continue; } s.dmgK = TUNE[id]; if (REST[id]) s.rest = REST[id]; }
