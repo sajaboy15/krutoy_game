@@ -432,6 +432,7 @@
     for (const f of W2.hooks.chai || []) { try { f(ch, plan); } catch (e) { console.error(e); } }
   });
   W2.hooks.chai = [];
+  W2.restOpts = W2.restOpts || [];
   W2.dastarkhan = () => {
     const s = W2.S(), ch = W2.chaiDef(W2.inside);
     if (!s || !ch) return;
@@ -444,11 +445,15 @@
       { label: t(`Save the journey|Сохранить поход|Safarni saqlash`), value: 'save' },
       { label: t(`Get up|Встать|Turish`), value: null, color: '#9a8a78' }
     ];
+    // extra rows from later files (the companions' talks by the fire): W2.restOpts = [() => ({label, value:'x:…', run()})]
+    const ext = [];
+    for (const f of W2.restOpts || []) { try { const o = f(ch); if (o) { ext.push(o); opts.splice(opts.length - 2, 0, { label: o.label, value: 'x:' + (ext.length - 1) }); } } catch (e) { console.error(e); } }
     G.UI.choice({
       title: tf(`{c} · {h}|{c} · {h}|{c} · {h}`, { c: t(ch.name), h: W2.clockText() }), cancel: true, options: opts,
       onPick: v => {
         if (!v) return;
         if (v === 'none') { setTimeout(W2.dastarkhan, 60); return; }
+        if (typeof v === 'string' && v.indexOf('x:') === 0) { const o = ext[+v.slice(2)]; if (o) setTimeout(o.run, 60); return; }
         if (v === 'save') { W2.rest('tea', true); setTimeout(() => G.SAVE_MENU && G.SAVE_MENU(), 80); return; }
         if (v === 'travel') { setTimeout(W2.travelMenu, 60); return; }
         W2.rest(v);
