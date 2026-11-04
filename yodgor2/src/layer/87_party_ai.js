@@ -352,6 +352,7 @@
         if (this._painT > fr()) { v *= 1.5; this._painT = 0; }
       }
       if (PARTY.node('nargiza', 'wave') && this.id === 'nargiza') v *= 1.25;
+      if (G.COMP && G.COMP.bondK) v *= G.COMP.bondK(this.id);   // 88f: Alp and Nargiza as a pair
       if (this.id === 'surayyo' && PARTY.node('surayyo', 'ours') && /tail/.test(String((G.Game.stage && G.Game.stage.plan && G.Game.stage.plan.biome) || ''))) v *= 1.1;
       return v;
     }
