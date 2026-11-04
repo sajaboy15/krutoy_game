@@ -2,6 +2,7 @@
 // each trace shows its lines and gives its coins once.     node test/s9_folk.js [lang=ru]
 const T = require('./s5_lib');
 const lang = process.argv[2] || 'ru';
+const EV = { streets: 'breath', mines: 'whip', tower: 'crows', rabat: 'caravan', withers: 'flags', spine: 'quiet' };
 const LIST = { streets: ['broom', 'slate', 'pot'], mines: ['tally', 'boots', 'stash'], tower: ['keeper', 'stamp', 'coins'], rabat: ['salt', 'names', 'bell'], withers: ['silence', 'flag', 'purse'], spine: ['bells', 'wool', 'bundle'] };
 (async () => {
   const b = await T.chromium.launch();
@@ -31,6 +32,12 @@ const LIST = { streets: ['broom', 'slate', 'pot'], mines: ['tally', 'boots', 'st
       res[id] = ok ? log.length + ' lines, +' + (g1 - g0) : 'MISSING';
       if (!ok) bad++;
     }
+    // the moment: walk onto its spot
+    const ev = EV[r];
+    await W(id => { const q = G.level.w2.spots['ev_' + id]; if (!q) return; const pl = G.world.player; pl.x = q.x; pl.y = q.y; pl.vx = pl.vy = 0; }, ev);
+    await T.tick(p, 20); const elog = []; await T.drain(p, elog);
+    res.moment = elog.length;
+    if (!elog.length) bad++;
     if (!res.npc) bad++;
     console.log(JSON.stringify(res));
   }

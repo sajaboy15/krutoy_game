@@ -1,4 +1,4 @@
-/* 89b_world_folk.js — people and small finds along the regions that were empty (with 89_world_dress.js).
+/* 89b_world_folk.js — people, small finds and one moment along the regions that were empty (with 89_world_dress.js).
    One local in each (a W2.npc on a new spot, all day) and two traces: something seen up close that tells a bit of the
    place (relic objects: lines, sometimes a few coins). No story flags, no Hollowness; nothing touches Sado (spoiler rule). */
 {
@@ -26,6 +26,40 @@
     });
     W2.schedule('folk_' + id, [{ from: 0, to: 24, region, spot: 'folk_' + id }]);
   }
+
+  // a moment on the way: once, when the hero first passes the spot (W2.trigger, 80_world_core.js)
+  function moment(id, region, frac, lines, fx) {
+    add(region, { kind: 'spot', id: 'ev_' + id, at: { frac } });
+    W2.trigger(region, 'ev_' + id, { r: 56, once: 'w2ev:' + id }, done => { try { fx && fx(); } catch (e) { console.error(e); } play(lines, done); });
+  }
+  const dust = () => { const p = G.world.player; G.shake(.35); for (let i = 0; i < 26; i++) G.FX.spawn({ x: p.x + G.U.rand(-140, 140), y: p.y - 150 - G.U.rand(0, 40), vx: 0, vy: G.U.rand(.6, 1.6), life: 90, size: 1, color: G.U.choose(['#8a7a6a', '#6a5a4a', '#a89880']), grav: .02 }); try { G.Audio.sfx('stomp', { vol: .3, pitch: .5 }); } catch (e) { /* ignore */ } };
+  const snd = (n, o) => () => { try { G.Audio.sfx(n, o || {}); } catch (e) { /* ignore */ } };
+  moment('breath', 'streets', 0.7, [
+    ['', `Somewhere above, the earth shifts. Dust runs from the ceiling in thin streams, and a buried house groans like a ship.|Где-то наверху сдвигается земля. С потолка тонкими струйками сыплется пыль, засыпанный дом скрипит, как корабль.|Qayerdadir tepada yer siljiydi. Shiftdan ingichka bo'lib chang to'kiladi, ko'milgan uy kemadek g'ichirlaydi.`],
+    ['sado', `It's breathing. The street is breathing, Ravshan.|Она дышит. Улица дышит, Равшан.|U nafas olyapti. Ko'cha nafas olyapti, Ravshan.`]
+  ], dust);
+  moment('whip', 'mines', 0.3, [
+    ['', `A whip cracks further down the gallery. For a moment every pick stops. Then, one by one, they start again.|Дальше по галерее щёлкает кнут. На миг замирают все кирки. Потом, одна за другой, снова стучат.|Yo'lakning narigi boshida qamchi shartillaydi. Bir zum hamma cho'kichlar to'xtaydi. Keyin birin-ketin yana taqillay boshlaydi.`],
+    ['hero', `Seven strokes. They count too.|Семь ударов. Они тоже считают.|Yetti zarba. Ular ham sanashadi.`]
+  ], snd('swing_heavy', { vol: .4, pitch: .6 }));
+  moment('crows', 'tower', 0.45, [
+    ['', `All the crows rise at once, without a sound, and circle the Tower. Then they settle again, each on its own heap.|Все вороны разом поднимаются — беззвучно — и кружат над Башней. Потом опускаются обратно, каждая на свою кучу.|Hamma qarg'alar birdan, tovushsiz ko'tariladi va minora tepasida aylanadi. Keyin har biri o'z uyumiga qaytib qo'nadi.`],
+    ['sado', `They've chosen. Each one knows which heap is hers.|Они выбрали. Каждая знает, какая куча её.|Ular tanlab olishgan. Har biri qaysi uyum uniki ekanini biladi.`]
+  ]);
+  moment('caravan', 'rabat', 0.6, [
+    ['', `Bells on the road. A caravan comes in through the dust: nine camels, the drivers' faces wrapped against the salt. Someone at the gate starts counting days aloud.|На дороге звенят колокольчики. Сквозь пыль входит караван: девять верблюдов, лица погонщиков замотаны от соли. Кто-то у ворот вслух начинает считать дни.|Yo'lda qo'ng'iroqchalar jiringlaydi. Chang orasidan karvon kirib keladi: to'qqizta tuya, tuyakashlarning yuzi tuzdan o'ralgan. Darvoza oldida kimdir kunlarni ovoz chiqarib sanay boshlaydi.`],
+    ['hero', `Day one. Thirty-nine to go.|День первый. Осталось тридцать девять.|Birinchi kun. O'ttiz to'qqiz kun qoldi.`]
+  ], snd('coin', { vol: .3, pitch: .7 }));
+  moment('flags', 'withers', 0.75, [
+    ['', `A gust tears a handful of flags off their lines and carries them out over the clouds. Nobody runs after them. Up here that's how a message is sent.|Порыв срывает с верёвок горсть флажков и уносит их над облаками. Никто не бежит следом. Здесь так и отправляют весточку.|Shamol arqondan bir hovuch bayroqchani uzib, bulutlar ustidan olib ketadi. Hech kim orqasidan yugurmaydi. Bu yerda xabar shunday jo'natiladi.`],
+    ['hero', `To whom?|Кому?|Kimga?`],
+    ['sado', `Whoever's looking up.|Тому, кто смотрит вверх.|Tepaga qarab turgan kishiga.`]
+  ], snd('whoosh', { vol: .4, pitch: .7 }));
+  moment('quiet', 'spine', 0.6, [
+    ['', `One after another, the bells on the bones go quiet. The wind is still blowing.|Один за другим смолкают колокольчики на костях. А ветер всё дует.|Suyaklardagi qo'ng'iroqchalar birin-ketin jim bo'ladi. Shamol esa hamon esyapti.`],
+    ['hero', `Stand still.|Стой. Не двигайся.|To'xta. Qimirlama.`],
+    ['', `A long minute. Then a single bell, far up the ridge, rings again — and the rest follow.|Долгая минута. Потом далеко на гребне звякает один колокольчик — и за ним остальные.|Uzoq bir daqiqa. Keyin tizma tepasida bitta qo'ng'iroqcha jiringlaydi — qolganlari ham ergashadi.`]
+  ]);
 
   /* ---------------------------------------------------------------- the Swallowed Streets */
   local('broom', 'streets', 0.25, { name: `Old Zulfiya|Старая Зульфия|Zulfiya momo`, look: 'tailwoman', prompt: `Talk to the old woman|Поговорить со старушкой|Kampir bilan gaplashish` }, [
