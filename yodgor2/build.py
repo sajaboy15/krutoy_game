@@ -125,6 +125,8 @@ OWN = [
     # ---- portraits of the new people are drawn by the layer ----
     ('const s={aksakal:"#5a3a2e",shaman:"#1f4a56",stone:"#4a4a56",hero:"#24305a"}',
      'const s=Object.assign({aksakal:"#5a3a2e",shaman:"#1f4a56",stone:"#4a4a56",hero:"#24305a"},' + G + '&&' + G + '.PORTRAIT_BG||{})', 1),
+    # ---- the Controls screen: the layer adds a second page with Yodgor's own keys (96b_controls.js) ----
+    ('Wt.forEach(((e,a)=>{const o=55+15*a;', '(' + G + '&&' + G + '.CONTROLS_ROWS?' + G + '.CONTROLS_ROWS(Wt,t):Wt).forEach(((e,a)=>{const o=55+15*a;', 1),
     ('a.translate(16,17),a.scale(.55,.55),"aksakal"===t)',
      'a.translate(16,17),a.scale(.55,.55),(' + G + '&&' + G + '.PORTRAITS||{})[t])' + G + '.PORTRAITS[t](a,e);else if("aksakal"===t)', 1),
 ]
