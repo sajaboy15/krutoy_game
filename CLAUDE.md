@@ -51,11 +51,16 @@ Roadmap = GDD chapter 26. Progress ≈ 62%. Review sheets for all rewritten text
 - **Stage 6, factions.** 75_factions, 76/77/78 arcs (18 quests), 79_economy_crime, faction bosses 65s_shirin / 65t_humo / 65u_oydin; test/s6_*.js. Reputation, double play, journal [N], merchants and haggling, stealth and crime.
 - **Stage 7a, companion systems.** 86_party, 87_party_ai, 88_party_ui; test/s7_*.js. Alp / Nargiza / Surayyo in combat, approval, stances [V], orders 1/2/3, downed/revive, branches. Debug: `?stage=N&god&party=alp,nargiza,surayyo`.
 
-**IN PROGRESS (interrupted by a rate limit)**
-- **Stage 8a, Souls-like boss movesets** for Glutton, Kampir, Hound, Choir, Albasty, Ak Bars, Ajdaho. Files 65a–65g; 65a provides the shared moveset runner `G.BM`, which the faction bosses use.
-  - Audit what exists, finish, and verify each boss: all moves fire, a dodge bot can take zero damage, kill time by weapon category, a full party does not trivialise the fight.
+**IN PROGRESS**
+- **Stage 8a, Souls-like boss movesets** (65a–65h, 65v_boss_tune.js = per-boss damage scale). Session of 4 Nov (evening):
+  - All 62 moves fire and end without page errors (test/s8_moves.js).
+  - Telegraph data fixed where it lied (Hound dash/coins, Kampir spit, Albasty tide/crawl, Choir glyphs/rings, Ak Bars swipe, Ajdaho dive/strafe); wave threats stay live while the wave runs.
+  - Perfect bot (test/s8_fight.js <pi> perfect, S8_TRACE=1 for per-hit traces): 2–5 hits per fight left for most bosses (not yet 0). Ajdaho hp 1000→720 (its head is rarely in reach): perfect bot kills it in ~5.7 min.
+  - Average bot deaths (test/s8_deaths.js, pool several runs: one run is far too noisy) and per-category kill times: being measured; 65v values are provisional.
+  - Party: kill time −5…−15%, companions are downed in most boss fights (they now read the telegraphs and dodge 3 of 4); the bot hero never revives them.
 
-**TOP PRIORITY NEXT (the author's complaint)**
+**REGIONS — first pass done (4 Nov evening)**: 89_world_dress.js (light along every floor run, props, hangings, life, deep backgrounds lifted, own looks for the Tower (ashen dusk, dakhma, crows) and the Withers (dawn above the clouds, sky caravanserai)), 89b_world_folk.js (a local and two finds in Streets, Mines, Tower, Rabat, Withers, Spine; review sheet notes/review_regions_folk.md). Before/after sheets: notes/shots_regions/. Tests: s9_regions.js, s9_folk.js, s4_perf.js REGS=… (+1.5 ms/frame). Still to do: events, more secrets, the regions' playing time (s5_traverse.js).
+**WAS TOP PRIORITY (the author's complaint)**
 - **Regions look empty.** Many are sparse or too dark: Swallowed Streets, Heart, Salt Mines, Tower of Silence, Rabat.
   - Cause: the art was made for the old short stages; the widened regions have bare walls and empty backgrounds.
   - Fix:
@@ -72,10 +77,11 @@ Roadmap = GDD chapter 26. Progress ≈ 62%. Review sheets for all rewritten text
 - **10.** Polish: cutscenes, key remapping, NG+, achievements, music by region/time, final balance, a real 10-hour measurement.
 
 **KNOWN ISSUES**
-- Companions cannot climb karez ladders (they catch up by teleport).
-- Albasty wipes the party.
-- The engine Controls screen does not list the new keys.
-- Humo is drawn as a recoloured eagle.
+- (fixed 4 Nov) Companions climb ladder tiles and follow the hook line (test/s7_hook.js: 0 teleports); the open-world karez has no ladder tiles.
+- Albasty wipes the party — now every boss downs the companions unless the hero revives them (see 8a).
+- (fixed 4 Nov) Controls screen page 2 lists the new keys (96b_controls.js, arrows turn the page).
+- (fixed 4 Nov) Humo has its own golden-bird drawing (65t).
+- UZ main menu shows «Sozlamalar» twice (Параметры and Настройки both translate to it).
 
 **OPEN QUESTION FOR THE AUTHOR**
 - design/BIBLE.md §10 (Sherzod and Bobokhon-aka, side story "A Father's Tithe"): it is unclear whether the author wants it. Do not implement it until he confirms.
