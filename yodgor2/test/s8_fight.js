@@ -104,7 +104,7 @@ fs.mkdirSync(LOGS, { recursive: true });
         const stam = G.CH && G.CH.st ? G.CH.st.v : 100;
         if (mode === 'god') G.CH.st.v = Math.max(stam, 30);
         if (B.hold > 0) { inp.keys.add('KeyJ'); B.hold--; }
-        else { inp.keys.delete('KeyJ'); if (!pl.act && Math.abs(want - pl.x) < 30 && Math.abs(tg.cy - pl.cy) < 70 && (mode === 'god' || stam > (mode === 'perfect' ? 62 : 45)) && G.frame % 3 === 0) { B.n++; B.hold = 2; R.attacks++; } }
+        else { inp.keys.delete('KeyJ'); if (!pl.act && Math.abs(want - pl.x) < 30 && Math.abs(tg.cy - pl.cy) < 70 && (mode === 'god' || stam > (mode === 'perfect' ? 54 : 45)) && G.frame % 3 === 0) { B.n++; B.hold = 2; R.attacks++; } }
       } else { inp.keys.delete('KeyJ'); B.hold = 0; }
       if (R.trace) {
         const pb = pl.box();

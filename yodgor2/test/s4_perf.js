@@ -27,7 +27,7 @@ async function meas(p, n) {
   } else {
     const p = await L.openWorld(b, '?world=tail&god', { liveRaf: false });
     await L.settle(p);
-    for (const r of ['tail', 'potters', 'bazaar', 'karez']) {
+    for (const r of (process.env.REGS || 'tail,potters,bazaar,karez').split(',')) {
       await p.evaluate(r => G.WORLD2.go(r, 'start', { now: true }), r); await L.settle(p);
       await meas(p, 30);
       out[r] = await meas(p, 240);

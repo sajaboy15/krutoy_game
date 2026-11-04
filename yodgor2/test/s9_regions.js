@@ -10,7 +10,7 @@ const N = +(process.argv[4] || 5);
   const p = await T.openWorld(b, '?stage=25&god', { viewport: { width: 1920, height: 1080 } });
   const W = (f, a) => p.evaluate(f, a);
   await T.settle(p, 200); await T.drain(p);
-  await W(() => { const s = G.WORLD2.S(); for (const k of ['light', 'hook', 'water', 'breath']) s.keys[k] = 1; G.WORLD2.setHour && G.WORLD2.setHour(+(process.env.HOUR || 10)); });
+  await W(h => { const s = G.WORLD2.S(); for (const k of ['light', 'hook', 'water', 'breath']) s.keys[k] = 1; G.WORLD2.setHour && G.WORLD2.setHour(h); }, +(process.env.HOUR || 10));
   const stats = {};
   for (const r of ALL) {
     if (only.length && !only.includes(r)) continue;
