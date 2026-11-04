@@ -34,6 +34,13 @@ const COMP = G.COMP = { talks: [], beats: [] };
   COMP.inside = () => (G.WORLD2 ? G.WORLD2.inside : null);
   COMP.moon = () => (G.WORLD2 && G.WORLD2.moonPhase ? G.WORLD2.moonPhase() : 0);
   COMP.name = id => (CAST[id] ? CAST[id].name : id);
+  // is the hero near a named spot of the current region (L.w2.spots / entries)?
+  COMP.near = (region, spot, r) => {
+    if (COMP.region() !== region || COMP.inside()) return false;
+    const L = G.level, p = G.world && G.world.player; if (!L || !L.w2 || !p) return false;
+    const at = (L.w2.spots && L.w2.spots[spot]) || (L.w2.entries && L.w2.entries[spot]); if (!at) return false;
+    return Math.abs(p.x - at.x) < (r || 90) && Math.abs(p.y - at.y) < 140;
+  };
   // the companions' journal: one entry per arc (fac 'comp')
   const TITLE = { alp: `The Name|Имя|Ism`, nargiza: `Bekzod|Бекзод|Bekzod`, surayyo: `The Pleiades|Плеяды|Hulkar`, knot: `What Alp Sold|Что продал Алп|Alp nimani sotgan` };
   for (const k in TITLE) FAC.quest('c_' + k, { fac: 'comp', title: TITLE[k] });
