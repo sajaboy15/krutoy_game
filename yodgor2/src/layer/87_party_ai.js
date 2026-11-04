@@ -27,6 +27,24 @@
     if (!l || Math.abs(l.x - p.x) > 12 || Math.abs(l.y - p.y) > 6) { trail.push({ x: p.x, y: p.y, n: ++seq }); if (trail.length > 420) trail.shift(); }
   }
   PX.trail = trail;
+  // the hook line: companions near the hero follow it (82_world_places.js W2.zip) instead of waiting for a teleport
+  if (G.WORLD2 && G.WORLD2.zip) {
+    const z0 = G.WORLD2.zip;
+    G.WORLD2.zip = (p, o) => {
+      const x0 = p && p.x, y0 = p && p.y, ok = z0(p, o);
+      try {
+        if (ok && p === pl() && o && o.pts && o.pts.length) {
+          let k = 0;
+          for (const c of PX.actors()) {
+            if (c.downed || c.gone || Math.hypot(c.x - x0, c.y - y0) > 220) continue;
+            c.zipF = { pts: [{ x: x0, y: y0 }].concat(o.pts.map(q => ({ x: q.x, y: q.y }))), i: 0, speed: o.speed || 5, delay: 10 + 9 * k++ };
+            c.climbing = null; PX.zips = (PX.zips || 0) + 1;
+          }
+        }
+      } catch (e) { console.error('[party] zip', e); }
+      return ok;
+    };
+  }
 
   /* ================================================================ the figure (people.js art, animated) */
   // capture the raw (un-outlined) figure that people.js paints, so it can be cut and moved
@@ -344,6 +362,7 @@
     /* ------------------------------------------------ being hit */
     takeHit(e) {
       if (this.dead || this.downed || this.gone || this.invulnT > 0 || (this.untargetable && e.type !== 'cover')) return false;
+      this.climbing = null;
       let d = e.dmg || 0;
       if (!e.raw) {
         d *= 1 - Math.max(this.def.armor, this.gear.armor);
@@ -431,6 +450,8 @@
       if (this.st.stun || this.st.freeze) { this.vx *= 0.8; G.Phys.step(this); this.setAnim('hurt'); return; }
       if (this.state === 'hurt') { this.vx *= 0.88; G.Phys.step(this); this.setAnim('hurt'); if (this.stateT > 14) this.setState('follow'); return; }
       if (p.dead) { this.vx *= 0.8; G.Phys.step(this); this.setAnim('idle'); return; }
+      if (this.zipF) { this.zipStep(); return; }
+      if (this.climbing) { this.climbStep(); this.watch(p); return; }
       if (!this.dodge(p)) this.brain(p);
       const spd = this.st.slow ? 0.5 : 1;
       if (this.st.slow) this.vx *= 0.9;
@@ -512,6 +533,32 @@
       if (this.onGround && dir && this.wallAhead(dir)) this.hop(this.wallH(dir) + 6, dir);
     }
     stop() { this.vx = U.approach(this.vx, 0, 0.4); }
+    // a ladder column within a tile of the feet: going up, a ladder at the chest; going down, one under the feet
+    ladderNear(dir) {
+      const L = G.level, LD = G.T.LADDER, ty = Math.floor((dir < 0 ? this.y - 10 : this.y + 4) / TS);
+      for (const d of [0, -1, 1]) { const tx = Math.floor(this.x / TS) + d; if (L.get(tx, ty) === LD) return tx * TS + TS / 2; }
+      return null;
+    }
+    // the hero's hook line (W2.zip): the companions go up the same rope, one after another
+    zipStep() {
+      const z = this.zipF;
+      if (z.delay > 0) { z.delay--; this.vx *= 0.8; G.Phys.step(this); return; }
+      const q = z.pts[z.i], dx = q.x - this.x, dy = q.y - this.y, d = Math.hypot(dx, dy);
+      if (d <= z.speed) { this.x = q.x; this.y = q.y; z.i++; } else { this.x += dx / d * z.speed; this.y += dy / d * z.speed; if (Math.abs(dx) > 1) this.facing = sgn(dx); }
+      this.vx = 0; this.vy = 0; this.onGround = false; this.setAnim('jump');
+      if (z.i >= z.pts.length) { this.zipF = null; this.vy = -1.5; this.stuckT = 0; this.offT = 0; this.lastN = seq; }
+    }
+    climbStep() {
+      const c = this.climbing, L = G.level, LD = G.T.LADDER;
+      c.t++;
+      this.x += (c.x - this.x) * 0.5; this.vx = 0; this.vy = 0; this.onGround = false;
+      this.y += c.dir * 1.9;
+      this.setAnim('jump');
+      const chest = L.get(Math.floor(this.x / TS), Math.floor((this.y - 10) / TS)), feet = L.get(Math.floor(this.x / TS), Math.floor((this.y + 2) / TS));
+      if (c.dir < 0 && (chest !== LD && feet !== LD || this.y <= c.ty - 2)) { this.climbing = null; this.vy = -3.2; this.vx = c.side * 1.6; }   // over the top: step off
+      else if (c.dir > 0 && (L.solidPx(this.x, this.y + 1) || feet !== LD && chest !== LD)) { this.climbing = null; }
+      if (c.t > 600) this.climbing = null;
+    }
     wallAhead(d) { const x = this.x + d * (this.w / 2 + 2); return G.level.solidPx(x, this.y - 4) || G.level.solidPx(x, this.y - this.h + 3); }
     wallH(d) { const x = this.x + d * (this.w / 2 + 3); let h = 0; while (h < 120 && G.level.solidPx(x, this.y - 2 - h)) h += 4; return h; }
     edgeAhead(d) { return G.level.groundBelow(this.x + d * (this.w / 2 + 4), this.y + 1, 40) === null; }
@@ -528,6 +575,10 @@
       const dx = tx - this.x, dy = ty - this.y, ad = Math.abs(dx);
       near = near === undefined ? 6 : near;
       if (!this.onGround) { if (ad > 3) this.vx = U.approach(this.vx, sgn(dx) * (spd || this.def.speed) * 1.1, 0.25); return false; }
+      if (Math.abs(dy) > 14 && ad < 70) {      // a karez ladder: climb it (it used to wait for the teleport)
+        const lx = this.ladderNear(dy < 0 ? -1 : 1);
+        if (lx !== null) { this.climbing = { x: lx, dir: dy < 0 ? -1 : 1, ty, side: sgn(dx) || this.facing, t: 0 }; PX.climbs = (PX.climbs || 0) + 1; return false; }
+      }
       if (dy < -14 && ad < 80) {               // up: a measured jump
         const h = -dy + 6, vy = Math.sqrt(2 * GRAV * (h + 4)), tUp = vy / GRAV, tf = tUp + Math.sqrt(2 * Math.max(1, 6) / GRAV);
         if (this.cds.d <= 0) { this.cds.d = 24; this.hop(h, sgn(dx), clamp(dx / tf, -3.2, 3.2)); }
@@ -543,7 +594,10 @@
       return false;
     }
     follow(p, slotD) {
-      const want = p.x - p.facing * slotD, far = Math.abs(p.x - this.x) > 50 || Math.abs(p.y - this.y) > 40;
+      let want = p.x - p.facing * slotD;
+      // a narrow roof or a ledge: no floor at the slot — stand by the hero instead of walking off the edge
+      if (p.onGround && G.level.groundBelow(want, p.y - 4, 24) === null) { want = p.x; for (const k of [0.5, -0.5, -1]) { const w2 = p.x - p.facing * slotD * k; if (G.level.groundBelow(w2, p.y - 4, 24) !== null) { want = w2; break; } } }
+      const far = Math.abs(p.x - this.x) > 50 || Math.abs(p.y - this.y) > 40;
       this.runSpd = far ? Math.max(this.def.speed * 1.35, 2.3) : this.def.speed;
       // direct: the same floor, nothing in between
       if (Math.abs(p.y - this.y) < 10 && p.onGround && this.onGround && this.clearTo(want)) { this.lastN = seq; return this.goTo(want, p.y, this.runSpd, 8); }

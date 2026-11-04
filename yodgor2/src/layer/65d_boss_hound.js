@@ -76,7 +76,7 @@
           for (let i = 0; i < 3; i++) {
             if (t === m.T[i] - 10 && i) { b.setState('twind'); b.facePlayer(); }
             if (i === 2 && t === m.T[1] + 24) { sfx('telegraph', { x: b.x, pitch: 1.4, vol: .5 }); }
-            thrust(b, t, m.T[i], m, i === 2 ? 1.1 : .75, 'h' + i);
+            thrust(b, t, m.T[i], m, i === 2 ? .85 : .7, 'h' + i);
           }
           return t >= m.T[2] + 12;
         } },
