@@ -122,29 +122,91 @@
     ['', `For one beat the Heart misses. Everything — the walls, the light, your own pulse — waits. Then it beats again, harder.|На один удар Сердце сбивается. Всё — стены, свет, твой собственный пульс — замирает. Потом оно бьётся снова, сильнее.|Bir zarbaga Yurak adashadi. Hamma narsa — devorlar, nur, o'z yuragingning urishi — kutib qoladi. Keyin u yana, qattiqroq uradi.`]
   ], [{ id: 'hand', label: `Put your hand on the wall.|Положить руку на стену.|Qo'lingni devorga qo'yish.` }, { id: 'walk', label: `Keep walking. Faster.|Идти дальше. Быстрее.|Yo'lda davom etish. Tezroq.` }], c => (c === 'hand' ? [() => (sadoAwake() ? ['sado', `He's frightened. Did you feel it? He's as frightened as we are.|Он испугался. Ты почувствовал? Он боится так же, как мы.|U qo'rqib ketdi. Sezdingmi? U ham biz kabi qo'rqyapti.`] : ['', `Under your palm the wall is warm and trembling, like a horse after a race.|Под ладонью стена тёплая и дрожит, как конь после скачки.|Kafting ostida devor iliq va titraydi, poygadan keyingi otdek.`])] : null));
 
+  /* ---------------------------------------------------------------- the hubs: more happening at once */
+  ev('pickpocket', 'bazaar', day, [
+    ['', `A boy of nine slides a purse off a cloth-seller's belt as neatly as a tailor's needle. The seller is still haggling. The boy sees you see him.|Мальчишка лет девяти снимает кошель с пояса торговца тканями — ловко, как портновская игла. Торговец всё ещё торгуется. Мальчишка видит, что ты видишь.|To'qqiz yoshlardagi bola mato sotuvchining belidan hamyonni tikuvchi ignasidek chaqqon sug'urib oladi. Sotuvchi hamon savdolashyapti. Bola uni ko'rganingni sezadi.`]
+  ], [{ id: 'catch', label: `Catch him by the collar.|Схватить его за шиворот.|Yoqasidan ushlash.` }, { id: 'tell', label: `Tell the seller.|Сказать торговцу.|Sotuvchiga aytish.` }, { id: 'wink', label: `Look the other way.|Отвернуться.|Teskari qarash.` }], c => {
+    if (c === 'catch') { rep('tail', -1); gold(5); return [['', `He gives the purse back and bites your hand. The seller tips you five tilla and calls him a Tail rat. The boy hears it.|Он отдаёт кошель и кусает тебя за руку. Торговец суёт тебе пять тилла и называет его хвостовой крысой. Мальчишка это слышит.|U hamyonni qaytaradi va qo'lingni tishlaydi. Sotuvchi senga besh tilla tutqazib, uni Dum kalamushi deydi. Bola buni eshitadi.`]]; }
+    if (c === 'tell') { rep('divan', 1); return [['', `The seller shouts for the guard. The boy is gone before the word "guard" is finished. The purse is gone too.|Торговец зовёт стражу. Мальчишка исчезает раньше, чем договорено слово «стража». Кошель — тоже.|Sotuvchi soqchini chaqiradi. «Soqchi» so'zi tugamasdan bola g'oyib bo'ladi. Hamyon ham.`]]; }
+    rep('tail', 1); return [['', `Later, near the drain, a small voice behind you: "The guards change at the fountain at noon. In case you need to know." Then nothing.|Позже, у стока, за спиной тонкий голос: «Стража у фонтана меняется в полдень. Вдруг тебе надо». И тишина.|Keyinroq, ariq yonida, orqangdan ingichka ovoz: «Favvora yonidagi soqchilar tushda almashadi. Kerak bo'lib qolsa». Keyin jimlik.`]];
+  });
+  ev('street_auction', 'bazaar', day, [
+    ['', `On an upturned crate a man auctions "a first kiss, behind the potters' kiln, spring rain, the girl laughed." A widow and a young noble bid against each other. The widow is losing.|На перевёрнутом ящике продают с торгов «первый поцелуй, за гончарной печью, весенний дождь, девушка смеялась». Торгуются вдова и молодой вельможа. Вдова проигрывает.|Ag'darilgan yashik ustida «birinchi o'pich, kulol xumdoni ortida, bahor yomg'iri, qiz kulgan» kim oshdiga sotilyapti. Beva bilan yosh zodagon bahslashyapti. Beva yutqazyapti.`]
+  ], [{ id: 'widow', label: `Put forty tilla behind the widow's bid.|Добавить вдове сорок тилла.|Bevaning narxiga qirq tilla qo'shish.`, price: 40 }, { id: 'ask', label: `Ask the widow why she wants it.|Спросить вдову, зачем ей это.|Bevadan buni nega xohlashini so'rash.` }, { id: 'pass', label: `Walk on.|Пройти мимо.|O'tib ketish.` }], c => {
+    if (c === 'widow') { gold(-40); rep('tail', 1); return [['', `She wins. She doesn't taste it. She holds the tumar against her cheek and says: "It was my husband's. He was the boy behind the kiln."|Она выигрывает. Не испивает. Прижимает тумар к щеке и говорит: «Это мужа. Это он был тем мальчиком за печью».|U yutadi. Totmaydi. Tumarni yuziga bosib aytadi: «Bu erimniki. Xumdon ortidagi bola o'sha edi».`]]; }
+    if (c === 'ask') return [['', `"He sold it in the hungry year to buy flour for us. Now it's on a crate for a boy to laugh at." The noble wins. He doesn't look happy either.|«Он продал его в голодный год, чтобы купить нам муки. А теперь оно на ящике, чтобы над ним смеялся мальчишка». Вельможа выигрывает. Счастливым он тоже не выглядит.|«Och yili bizga un olish uchun sotgan edi. Endi esa bolakay kulishi uchun yashik ustida». Zodagon yutadi. U ham baxtli ko'rinmaydi.`]];
+    return null;
+  });
+  ev('rigged_scales', 'bazaar', day, [
+    ['', `Two spice-sellers are shouting over one set of scales. One says the other's weights are filed; the other says the first has a magnet in his sleeve. A crowd is enjoying it.|Двое торговцев специями орут над одними весами. Один говорит, что гири у второго подпилены; второй — что у первого в рукаве магнит. Толпа наслаждается.|Ikki ziravor sotuvchi bitta tarozi ustida baqirishyapti. Biri ikkinchisining toshlari egovlangan deydi, ikkinchisi birinchisining yengida magnit bor deydi. Olomon zavqlanyapti.`]
+  ], [FAC.chk('agi', 6, `Snatch the weights and the sleeve before either can hide anything|Выхватить гири и рукав, пока никто ничего не спрятал|Hech kim yashirib ulgurmasdan toshlarni ham, yengni ham tortib olish`, { id: 'check' }), { id: 'split', label: `"Weigh on mine. I'm a yodchi; I don't cheat with weights."|«Взвешивайте на моих. Я ёдчи, я гирями не мухлюю».|«Menikida torting. Men yodchiman, tosh bilan aldamayman».` }, { id: 'pass', label: `Enjoy it with the crowd.|Насладиться вместе с толпой.|Olomon bilan birga zavqlanish.` }], c => {
+    if (c === 'check') { rep('tail', 1); rep('divan', -1); gold(8); return [['', `Filed weights and a magnet. Both of them. The crowd laughs them out of the row, and a woman presses eight tilla on you "for the show".|Подпиленные гири и магнит. У обоих. Толпа выгоняет их из ряда смехом, а какая-то женщина суёт тебе восемь тилла «за представление».|Egovlangan toshlar ham, magnit ham. Ikkalasida. Olomon ularni kulgi bilan rastadan haydaydi, bir ayol senga «tomosha uchun» sakkiz tilla tutqazadi.`]]; }
+    if (c === 'split') return [['', `Your weights say they were both honest. The yodchi's weights say what the yodchi wants. Everybody knows it, nobody says it, both pay you a coin.|Твои гири говорят, что оба были честны. Гири ёдчи говорят то, что нужно ёдчи. Все это знают, никто не говорит, оба платят тебе по монете.|Sening toshlaring ikkalasi ham halol edi deydi. Yodchining toshlari yodchiga kerakini aytadi. Hamma biladi, hech kim aytmaydi, ikkalasi senga bir tangadan beradi.`]];
+    return null;
+  });
+  ev('water_line', 'tail', day, [
+    ['', `A line at the tap by the square. A broad man walks to the front past an old woman with two jugs. She doesn't argue. Nobody does.|Очередь у крана на площади. Широкоплечий мужик проходит вперёд мимо старухи с двумя кувшинами. Она не спорит. Никто не спорит.|Maydondagi jo'mrak oldida navbat. Yelkador bir kishi ikki ko'zali kampirning yonidan o'tib, oldinga chiqadi. Kampir tortishmaydi. Hech kim tortishmaydi.`]
+  ], [{ id: 'shove', label: `Put him back where he belongs.|Вернуть его на его место.|Uni o'z joyiga qaytarish.` }, { id: 'jugs', label: `Carry her jugs to the front with you.|Взять её кувшины и пройти вперёд с ней.|Uning ko'zalarini olib, u bilan oldinga o'tish.` }, { id: 'pass', label: `It's not your line.|Это не твоя очередь.|Bu sening navbating emas.` }], c => {
+    if (c === 'shove') { rep('tail', 2); FAC.react({ surayyo: 3, alp: 2 }); return [['', `He's bigger, but he's never been shoved by a yodchi. He goes to the back. Later his brother will remember your face. So will the old woman.|Он крупнее, но его никогда не толкал ёдчи. Он уходит в конец. Позже его брат запомнит твоё лицо. Старуха тоже.|U kattaroq, lekin uni hech qachon yodchi itarmagan. Oxiriga boradi. Keyin akasi yuzingni eslab qoladi. Kampir ham.`]]; }
+    if (c === 'jugs') { rep('tail', 1); FAC.react({ surayyo: 2 }); return [['', `Nobody stops a yodchi in a line. She fills her jugs and calls you "son", which is a lie and a kindness.|Ёдчи в очереди никто не останавливает. Она наполняет кувшины и зовёт тебя «сынок» — это и ложь, и доброта.|Navbatda yodchini hech kim to'xtatmaydi. U ko'zalarini to'ldirib, seni «o'g'lim» deydi — bu ham yolg'on, ham mehr.`]]; }
+    return null;
+  });
+  ev('funeral', 'tail', () => SIDE.hour() >= 8 && SIDE.hour() < 17, [
+    ['', `A small funeral turns into the lane. The family stops when they see your seal. A dead man's memories are tithe too, if no yodchi signs them off. They can't pay.|В переулок сворачивают маленькие похороны. Семья останавливается, увидев твою печать. Память покойника — тоже десятина, если её не спишет ёдчи. Платить им нечем.|Tor ko'chaga kichkina dafn marosimi buriladi. Oila muhringni ko'rib to'xtaydi. Yodchi hisobdan chiqarmasa, marhumning xotirasi ham ushr. To'lashga pullari yo'q.`]
+  ], [{ id: 'sign', label: `Sign him off for nothing.|Списать его даром.|Uni tekinga hisobdan chiqarish.` }, { id: 'half', label: `Half the fee, and it's done.|Половина пошлины — и дело с концом.|Bojning yarmi — va ish tamom.` }, { id: 'pass', label: `"It's not my district."|«Это не мой участок».|«Bu mening hududim emas».` }], c => {
+    if (c === 'sign') { rep('tail', 2); rep('singers', -1); return [['', `The widow kisses your seal, not your hand. The Singers will find the empty line in your book one day and ask about it.|Вдова целует твою печать, а не руку. Однажды Певцы найдут пустую строку в твоей книге и спросят о ней.|Beva qo'lingni emas, muhringni o'padi. Bir kun Xonandalar daftaringdagi bo'sh qatorni topib, so'rashadi.`]]; }
+    if (c === 'half') { gold(15); return [['', `They pay in copper, counted twice. The procession goes on, a little quieter.|Платят медью, пересчитанной дважды. Процессия идёт дальше, чуть тише.|Ikki marta sanalgan mis bilan to'lashadi. Marosim biroz jimroq davom etadi.`]]; }
+    rep('tail', -1); return [['', `Behind you, a man says loudly that the yodchi didn't even stop for the dead. Someone else says: at least he didn't take anything.|За спиной кто-то громко говорит, что ёдчи даже для мёртвого не остановился. Другой отвечает: зато ничего не взял.|Orqangda kimdir baland ovozda: yodchi hatto marhum uchun ham to'xtamadi, deydi. Boshqasi javob beradi: hech bo'lmasa hech narsa olmadi.`]];
+  });
+  ev('kids_game', 'tail', day, [
+    ['', `Children are playing "yodchi and debtor" in the dust. The yodchi has a stick for a seal. They stop when they see the real one. "Play the debtor," says the smallest. "You'd be good at it."|Дети в пыли играют «в ёдчи и должника». У «ёдчи» палка вместо печати. Увидев настоящего, они замирают. «Будь должником, — говорит самая маленькая. — У тебя получится».|Bolalar changda «yodchi va qarzdor» o'ynashyapti. «Yodchi»da muhr o'rniga tayoq. Haqiqiysini ko'rib, to'xtab qolishadi. «Qarzdor bo'l, — deydi eng kichigi. — Senda chiqadi».`]
+  ], [{ id: 'play', label: `Kneel and give them a memory: "my best boots".|Встать на колено и отдать им воспоминание: «мои лучшие сапоги».|Tiz cho'kib, ularga xotira berish: «eng yaxshi etigim».` }, { id: 'teach', label: `Show the stick-yodchi how a real seal is held.|Показать «ёдчи», как держат настоящую печать.|«Yodchi»ga haqiqiy muhr qanday ushlanishini ko'rsatish.` }, { id: 'pass', label: `Walk on.|Пройти мимо.|O'tib ketish.` }], c => {
+    if (c === 'play') { rep('tail', 1); FAC.react({ nargiza: 3, surayyo: 2 }); return [['', `The little yodchi takes your boots with great ceremony and gives them back at once: "Paid in full." For a moment it is the easiest debt in Yodgor.|Маленький ёдчи с великой торжественностью забирает твои сапоги и тут же отдаёт: «Уплачено сполна». На миг это самый лёгкий долг в Ёдгоре.|Kichkina yodchi katta tantana bilan etigingni olib, darhol qaytaradi: «To'liq to'landi». Bir lahzaga bu Yodgordagi eng yengil qarz.`]]; }
+    if (c === 'teach') { FAC.react({ alp: 2 }); return [['', `Thumb under, two fingers on top, never point it at a face. The boy practises on a goat. The goat is not impressed.|Большой палец снизу, два сверху, никогда не направляй в лицо. Мальчишка тренируется на козе. Коза не впечатлена.|Bosh barmoq pastda, ikkitasi tepada, hech qachon yuzga qaratma. Bola echkida mashq qiladi. Echkini hayratga solmaydi.`]]; }
+    return null;
+  });
+  ev('petition', 'ark', day, [
+    ['', `A man in a mended robe throws himself at your feet at the Ark gate. He takes you for a Divan officer. "My petition. Eleven months. Please. Just carry it in."|У ворот Арка к твоим ногам бросается мужчина в штопаном халате. Принимает тебя за чиновника Дивана. «Моё прошение. Одиннадцать месяцев. Прошу. Просто занесите».|Ark darvozasi oldida yamoqli to'n kiygan kishi oyog'ingga yiqiladi. Seni Devon amaldori deb o'ylaydi. «Arzim. O'n bir oy. Iltimos. Faqat olib kirib bering».`]
+  ], [{ id: 'carry', label: `Take it inside and put it on the right desk.|Отнести внутрь и положить на нужный стол.|Ichkariga olib kirib, kerakli stolga qo'yish.` }, { id: 'truth', label: `"I'm a yodchi, not the Divan."|«Я ёдчи, а не Диван».|«Men yodchiman, Devon emasman».` }, { id: 'coin', label: `Take the coin he offers for it.|Взять монету, которую он за это суёт.|U buning uchun tutqazayotgan tangani olish.` }], c => {
+    if (c === 'carry') { rep('divan', 1); rep('tail', 1); return [['', `The clerk looks at the petition, at your seal, at the petition again, and moves it from the bottom of the pile to the middle. In the Ark, that's a miracle.|Писарь смотрит на прошение, на твою печать, снова на прошение — и перекладывает его со дна стопки в середину. В Арке это чудо.|Mirza arzga, muhringga, yana arzga qaraydi — va uni uyumning tagidan o'rtasiga qo'yadi. Arkda bu mo'jiza.`]]; }
+    if (c === 'truth') return [['', `"Then you're worse," he says, and gets up, and goes back to his place by the gate, where he has been for eleven months.|«Тогда ты ещё хуже», — говорит он, встаёт и возвращается на своё место у ворот, где стоит уже одиннадцать месяцев.|«Unda sen yomonroqsan», — deydi u, o'rnidan turadi va o'n bir oydan beri turgan darvoza oldidagi joyiga qaytadi.`]];
+    gold(10); rep('tail', -1); return [['', `Ten tilla. You put the petition in your satchel. It's still there. You'll find it one day under the tumars and wonder whose it was.|Десять тилла. Ты кладёшь прошение в сумку. Оно и сейчас там. Однажды найдёшь его под тумарами и будешь гадать, чьё оно.|O'n tilla. Arzni xaltangga solasan. U hozir ham o'sha yerda. Bir kun tumarlar ostidan topib, kimniki ekan deb o'ylab qolasan.`]];
+  });
+  ev('duel', 'ark', () => SIDE.hour() >= 15 && SIDE.hour() < 20, [
+    ['', `Two young nobles in the rose garden, sabres out, seconds sweating. One bought a memory the other had sold, of the other's mother. Neither will say which memory.|Двое молодых вельмож в розовом саду, сабли наголо, секунданты потеют. Один купил воспоминание, которое продал другой, — о матери второго. Какое — не говорят оба.|Atirgul bog'ida ikki yosh zodagon, qilichlar yalang'och, yordamchilar terlab ketgan. Biri ikkinchisi sotgan xotirani sotib olgan — ikkinchisining onasi haqida. Qaysi xotira ekanini ikkalasi ham aytmaydi.`]
+  ], [FAC.chk('backbone', 1, `Step between the blades.|Встать между клинками.|Qilichlar orasiga turish.`, { id: 'stop' }), { id: 'buy', label: `Offer to buy the memory from both of them.|Предложить выкупить это воспоминание у обоих.|Bu xotirani ikkalasidan ham sotib olishni taklif qilish.` }, { id: 'watch', label: `Watch.|Смотреть.|Tomosha qilish.` }], c => {
+    if (c === 'stop') { rep('divan', -1); FAC.react({ alp: 3 }); return [['', `A yodchi's seal between two Divan sabres. They stop, because nobody wants to explain this to their fathers. Both will hate you a little now, which is better than one of them dead.|Печать ёдчи между двумя саблями Дивана. Они останавливаются: никто не хочет объяснять это отцу. Теперь оба тебя немного ненавидят — лучше, чем если бы один был мёртв.|Ikki Devon qilichi orasida yodchi muhri. To'xtashadi, chunki hech kim buni otasiga tushuntirmoqchi emas. Endi ikkalasi ham seni biroz yomon ko'radi — bittasi o'lgandan yaxshiroq.`]]; }
+    if (c === 'buy') { gold(-30); return [['', `Thirty tilla and the tumar is yours. You don't taste it. The sabres go back in. The two of them leave by different gates, which in the Ark counts as peace.|Тридцать тилла — и тумар твой. Ты его не испиваешь. Сабли в ножны. Они уходят через разные ворота, что в Арке считается миром.|O'ttiz tilla — tumar seniki. Uni totmaysan. Qilichlar qiniga qaytadi. Ikkalasi turli darvozalardan chiqib ketadi, Arkda bu tinchlik hisoblanadi.`]]; }
+    rep('divan', 1); return [['', `It ends at the first blood, a cut on a cheek. The cut one wins: the other stops, appalled, as if he had just remembered something.|Всё кончается первой кровью — порезом на щеке. Побеждает порезанный: второй замирает в ужасе, будто только что что-то вспомнил.|Birinchi qon bilan tugaydi — yuzdagi kesik. Kesilgan g'olib chiqadi: ikkinchisi go'yo hozirgina nimanidir eslagandek dahshatdan qotib qoladi.`]];
+  });
+
   /* ---------------------------------------------------------------- placing and playing */
-  let cur = null;
+  // the big hubs hold up to three at once, spread along the street; elsewhere one, about every other visit
+  let cur = [];
+  const HUBS = { tail: 3, bazaar: 3, ark: 2 };
   G.WORLD2.onEnter('*', (def, info) => {
-    cur = null;
+    cur = [];
     const s = S(), list = E.filter(e => { if (e.region !== def.id || s.done[e.id]) return false; try { return e.when(); } catch (x) { return false; } });
-    if (!list.length || Math.random() > .55) return;
-    const L = info.level; if (!L || !L.pw) return;
-    const e = list[Math.floor(Math.random() * list.length)];
-    cur = { e, x: L.pw * (0.25 + Math.random() * 0.55) };
+    const L = info.level; if (!list.length || !L || !L.pw) return;
+    const n = HUBS[def.id] || (Math.random() < .55 ? 1 : 0);
+    const pool = list.slice().sort(() => Math.random() - .5).slice(0, n);
+    pool.forEach((e, i) => cur.push({ e, x: L.pw * (0.12 + (i + Math.random() * .7) * 0.8 / Math.max(1, pool.length)) }));
   });
   let tk = 0;
   G.WORLD2.ticks.push(() => {
-    if (++tk % 15 || !cur || !G.world) return;
-    const p = G.world.player; if (!p || Math.abs(p.x - cur.x) > 70 || !quiet()) return;
-    const { e } = cur;
+    if (++tk % 15 || !cur.length || !G.world) return;
+    const p = G.world.player; if (!p || !quiet()) return;
+    const i = cur.findIndex(c => Math.abs(p.x - c.x) < 70);
+    if (i < 0) return;
+    const { e } = cur[i];
     let ok = true; try { ok = e.when(); } catch (x) { ok = false; }
     if (!ok) return;
-    cur = null;
+    cur.splice(i, 1);
     scene(done => play(e.text, () => ask(`What do you do?|Что делаешь?|Nima qilasan?`, e.opts, o => {
       S().done[e.id] = o.id; save();
       let lines = null; try { lines = e.fx(o.id); } catch (x) { console.error('[events]', x); }
       if (lines && lines.length) play(lines, done); else done();
     })));
   });
-  G.EVENTS = { list: E, S, force: id => { const e = E.find(x => x.id === id); if (e && G.world && G.world.player) cur = { e, x: G.world.player.x }; } };
+  G.EVENTS = { list: E, S, force: id => { const e = E.find(x => x.id === id); if (e && G.world && G.world.player) cur.push({ e, x: G.world.player.x }); } };
 }
