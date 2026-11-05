@@ -230,7 +230,7 @@
     const s = W2.S();
     ctx.save();
     FX.tt(ctx, W2.clockText(), G.W - 24, HUD_Y - 4, 60, { size: 6, align: 'right', color: '#f2e6c8' });
-    if (s && s.obj) FX.tt(ctx, '◆ ' + t(s.obj), G.W - 6, HUD_Y + 10, 170, { size: 5.5, align: 'right', color: '#ffe7a6' });
+    if (s && s.obj && G.HINTS !== false) FX.tt(ctx, '◆ ' + t(s.obj), G.W - 6, HUD_Y + 10, 170, { size: 5.5, align: 'right', color: '#ffe7a6' });
     ctx.restore();
   });
 }

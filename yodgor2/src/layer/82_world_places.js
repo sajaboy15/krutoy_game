@@ -254,7 +254,7 @@
     W2.go(tg[0], tg[1], { sfx: ex.sfx });
     return true;
   }
-  const toLabel = ex => { const tg = target(ex); const r = tg && W2.regions[tg[0]]; return ex.label || (r ? tf(`To: {r}|Путь: {r}|Yo'l: {r}`, { r: t(r.name) }) : `A closed way|Закрытый путь|Yopiq yo'l`); };
+  const toLabel = ex => { const tg = target(ex); const r = tg && W2.regions[tg[0]]; return ex.label ? t(ex.label) : (r ? tf(`To: {r}|Путь: {r}|Yo'l: {r}`, { r: t(r.name) }) : `A closed way|Закрытый путь|Yopiq yo'l`); };
   W2.kind('exit_street', {
     place(L, ex) {
       if (ex.at === 'left') { const tx = 3; const e = entryAt(L, 7, 1); return { tx, ty: e.y / TS - 1, x: tx * TS + 8, y: e.y, entry: e, side: -1 }; }

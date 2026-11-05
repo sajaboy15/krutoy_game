@@ -126,6 +126,11 @@ OWN = [
     ('const s={aksakal:"#5a3a2e",shaman:"#1f4a56",stone:"#4a4a56",hero:"#24305a"}',
      'const s=Object.assign({aksakal:"#5a3a2e",shaman:"#1f4a56",stone:"#4a4a56",hero:"#24305a"},' + G + '&&' + G + '.PORTRAIT_BG||{})', 1),
     # ---- the Controls screen: the layer adds a second page with Yodgor's own keys (96b_controls.js) ----
+    # ---- settings (01_settings.js): text speed, clean HUD (shown only in a fight) ----
+    ('t.chars=Math.min(a,t.chars+(o.isDown("confirm")&&t.t>20?3:1.25))', 't.chars=Math.min(a,t.chars+(o.isDown("confirm")&&t.t>20?3:1.25*(' + G + '.TEXT_SPEED||1)))', 1),
+    ('Se.lowT++,Se.show=Math.min(1,Se.show+.08);', 'Se.lowT++,Se.show=' + G + '.HUD_WANT?Math.max(0,Math.min(1,Se.show+(' + G + '.HUD_WANT()>Se.show?.08:-.03))):Math.min(1,Se.show+.08);', 1),
+    # ---- key remapping (01_settings.js): the engine's key and pad tables become reachable ----
+    ('update(){this.prev=this.down;const e={};for(const t in a)for(const o of a[t])', 'update(){' + G + '.KEYMAP_KB||(' + G + '.KEYMAP_KB=a,' + G + '.KEYMAP_PAD=o);this.prev=this.down;const e={};for(const t in a)for(const o of a[t])', 1),
     ('Wt.forEach(((e,a)=>{const o=55+15*a;', '(' + G + '&&' + G + '.CONTROLS_ROWS?' + G + '.CONTROLS_ROWS(Wt,t):Wt).forEach(((e,a)=>{const o=55+15*a;', 1),
     ('a.translate(16,17),a.scale(.55,.55),"aksakal"===t)',
      'a.translate(16,17),a.scale(.55,.55),(' + G + '&&' + G + '.PORTRAITS||{})[t])' + G + '.PORTRAITS[t](a,e);else if("aksakal"===t)', 1),

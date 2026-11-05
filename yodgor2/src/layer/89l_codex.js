@@ -1,4 +1,4 @@
-/* 89l_codex.js — the yodchi's book [L] (GDD ch. 20 "Коллекции", "Книги и записки"; ch. 16 families).
+/* 89l_codex.js — the yodchi's book [Y] (GDD ch. 20 "Коллекции", "Книги и записки"; ch. 16 families).
    One page of the character screen with four sections:
      Notes     — the texts found in the world (89m_books.js fills CODEX.BOOKS); read again any time;
      Memories  — Ravshan's lost memories (the tumars of 50_story_api: R().mem), titled here;
@@ -89,6 +89,7 @@
   ];
   CODEX.BOSSES = BOSSES;
   const BEAST_ID = {}; BEAST.forEach(b => { BEAST_ID[b[0]] = b; });
+  CODEX.addBeast = b => { if (BEAST_ID[b[0]]) return; BEAST.push(b); BEAST_ID[b[0]] = b; };
   const BOSS_ID = {}; BOSSES.forEach(b => { BOSS_ID[b[0]] = b; });
   // a copy (EK.clone, 8b) counts as the type it was cloned from when it names one
   const baseOf = d => { if (!d) return null; let id = d.id; if (BEAST_ID[id] || BOSS_ID[id]) return id; if (d.codexAs && (BEAST_ID[d.codexAs] || BOSS_ID[d.codexAs])) return d.codexAs; return null; };
@@ -105,7 +106,7 @@
       if (BOSS_ID[id]) c.bs[id] = 1;
       lastKill = { id, t: performance.now() };
       if (BEAST_ID[id] && (first || c.k[id] === 3)) {
-        toast(c.k[id] === 3 && !c.ts[id] ? tf(`Yodchi's book: the weak spot of "{n}" (L)|Книга ёдчи: слабое место — «{n}» (L)|Yodchi kitobi: «{n}»ning zaif joyi (L)`, { n: nameOf(id) }) : tf(`Yodchi's book: {n} (L)|Книга ёдчи: {n} (L)|Yodchi kitobi: {n} (L)`, { n: nameOf(id) }), '#c9b48a');
+        toast(c.k[id] === 3 && !c.ts[id] ? tf(`Yodchi's book: the weak spot of "{n}" (Y)|Книга ёдчи: слабое место — «{n}» (Y)|Yodchi kitobi: «{n}»ning zaif joyi (Y)`, { n: nameOf(id) }) : tf(`Yodchi's book: {n} (Y)|Книга ёдчи: {n} (Y)|Yodchi kitobi: {n} (Y)`, { n: nameOf(id) }), '#c9b48a');
       }
       save();
     } catch (x) { console.error('[codex]', x); }
@@ -116,7 +117,7 @@
     const d = G.Items.defs.ys_drink; if (!d || d._codex) return;
     const u0 = d.use; d._codex = true;
     d.use = function () {
-      try { if (lastKill && performance.now() - lastKill.t < 7000 && BEAST_ID[lastKill.id] && !SG().ts[lastKill.id]) { SG().ts[lastKill.id] = 1; save(); toast(tf(`Yodchi's book: the weak spot of "{n}" (L)|Книга ёдчи: слабое место — «{n}» (L)|Yodchi kitobi: «{n}»ning zaif joyi (L)`, { n: nameOf(lastKill.id) }), '#c9b4ff'); } } catch (x) { /* ignore */ }
+      try { if (lastKill && performance.now() - lastKill.t < 7000 && BEAST_ID[lastKill.id] && !SG().ts[lastKill.id]) { SG().ts[lastKill.id] = 1; save(); toast(tf(`Yodchi's book: the weak spot of "{n}" (Y)|Книга ёдчи: слабое место — «{n}» (Y)|Yodchi kitobi: «{n}»ning zaif joyi (Y)`, { n: nameOf(lastKill.id) }), '#c9b4ff'); } } catch (x) { /* ignore */ }
       return u0.apply(this, arguments);
     };
   });
@@ -184,7 +185,7 @@
     CODEX.BOOKS.push(def); CODEX.BOOK[def.id] = def;
     const reg = G.WORLD2 && G.WORLD2.regions && G.WORLD2.regions[def.region];
     if (!reg || !reg.objects) { console.warn('[codex] no region', def.region, def.id); return; }
-    const lines = [() => { const c = SG(), first = !c.b[def.id]; c.b[def.id] = 1; save(); if (first) setTimeout(() => toast(tf(`In the yodchi's book: {n} (L)|В книге ёдчи: {n} (L)|Yodchi kitobida: {n} (L)`, { n: t(def.title) }), '#e8d8a8'), 30); return ['', t(CODEX.KIND[def.kind] || CODEX.KIND.note) + ' · ' + t(def.title)]; }]
+    const lines = [() => { const c = SG(), first = !c.b[def.id]; c.b[def.id] = 1; save(); if (first) setTimeout(() => toast(tf(`In the yodchi's book: {n} (Y)|В книге ёдчи: {n} (Y)|Yodchi kitobida: {n} (Y)`, { n: t(def.title) }), '#e8d8a8'), 30); return ['', t(CODEX.KIND[def.kind] || CODEX.KIND.note) + ' · ' + t(def.title)]; }]
       .concat(def.text.map(s => ['', s]));
     reg.objects.push({ kind: 'relic', id: 'bk_' + def.id, at: { frac: def.frac }, art: 'w2book', bk: def.kind, prompt: READ, lines });
     // a cache the note points to: it appears only once the note has been read
@@ -197,12 +198,12 @@
   // a relic is taken once per run (W2.take); a book read in an earlier run is still in the book
   CODEX.readBooks = () => CODEX.BOOKS.filter(b => SG().b[b.id]);
 
-  /* ================================================================ the page [L] */
+  /* ================================================================ the page [Y] */
   const CU = G.CHUI;
   if (CU && CU.EXT) {
     const UI = CU, D0 = () => UI._dbg;
-    UI.PAGES.push('book'); UI.PAGE_NAME.book = `Yodchi's book|Книга ёдчи|Yodchi kitobi`; UI.PAGE_KEY.book = 'L'; UI.EXT_KEY.KeyL = 'book';
-    const SEC = [`Notes|Записки|Xatlar`, `Memories|Воспоминания|Xotiralar`, `Bestiary|Бестиарий|Maxluqnoma`, `Collected|Собрано|To'plangan`];
+    UI.PAGES.push('book'); UI.PAGE_NAME.book = `Yodchi's book|Книга ёдчи|Yodchi kitobi`; UI.PAGE_KEY.book = 'Y'; UI.EXT_KEY.KeyY = 'book';
+    const SEC = [`Notes|Записки|Xatlar`, `Memories|Воспоминания|Xotiralar`, `Bestiary|Бестиарий|Maxluqnoma`, `Collected|Собрано|To'plangan`, `Deeds|Деяния|Ishlar`];
     const PS = CODEX.page = { sec: 0, sel: 0, scroll: 0 };
     const COL = { gold: '#e2b452', goldL: '#ffe7a6', dim: '#9a8c9e', cream: '#f2e6c8', bad: '#ff8a7a', good: '#9cf0a0', lav: '#c9b4ff' };
     // the rows of a section: {label, sub, col, body:[strings], head}
@@ -241,6 +242,14 @@
         }
         return out;
       }
+      if (PS.sec === 4) {
+        const A = G.ACH; if (!A) return [];
+        const S0 = A.S(), tm = A.time();
+        const out = [{ label: tf(`Play time: {a} this journey · {b} in all|Время в игре: {a} в этом походе · {b} всего|O'yin vaqti: bu safar {a} · jami {b}`, { a: tm.run, b: tm.all }), col: COL.dim, body: [t(`Hours:minutes of play, pauses not counted.|Часы:минуты игры, без пауз.|O'yin soat:daqiqalari, pauzalarsiz.`)] }];
+        out.push({ head: true, label: t(`Deeds|Деяния|Ishlar`).toUpperCase(), sub: A.count() + '/' + A.LIST.length });
+        for (const a of A.LIST) out.push({ label: (S0[a.id] ? '★ ' : '☆ ') + t(a.name), col: S0[a.id] ? '#ffd77a' : '#8a7c90', body: [t(a.desc)] });
+        return out;
+      }
       // collected
       const out = [];
       const add = (label, have, all, note) => out.push({ label, sub: have + (all ? ' / ' + all : ''), col: all && have >= all ? COL.good : COL.cream, body: note ? [note] : [] });
@@ -276,7 +285,7 @@
       draw(ctx, HIT) {
         const { panel, txt, inset, plate, para } = D0();
         SEC.forEach((s, i) => {
-          const w = 84, x = 22 + i * (w + 4), on = i === PS.sec;
+          const w = 84, x = 22 + i * (w + 4), on = i === PS.sec; if (x + w > G.W - 14) return;
           plate(ctx, x, 36, w, on ? '#3a2a14' : '#1d1626', on);
           txt(ctx, t(s).toUpperCase(), x + w / 2, 38.6, { size: 5, align: 'center', color: on ? COL.goldL : COL.dim, weight: 700, serif: true });
           HIT.push({ x, y: 34, w, h: 15, click: () => { PS.sec = i; PS.sel = 0; PS.scroll = 0; sfx('ui_move'); } });

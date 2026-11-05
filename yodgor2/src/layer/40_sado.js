@@ -64,7 +64,7 @@ SMOOTH_DRAW.push((ctx, st) => {
   const text = crackle(t(sub.cur.text), sub.cur.who === 'sado' ? R().void : 0);
   ctx.save();
   ctx.globalAlpha = a;
-  FX.tt(ctx, (name ? name + ':  ' : '') + text, G.W / 2 - 150, G.H - 46, 300, { size: 7, align: 'center', color: sub.cur.who === 'sado' ? '#bff8ee' : '#f2e6c8' });
+  FX.tt(ctx, (name ? name + ':  ' : '') + text, G.W / 2 - 150, G.H - 46 - 7 * ((G.SUB_SCALE || 1) - 1), 300, { size: 7 * (G.SUB_SCALE || 1), align: 'center', color: sub.cur.who === 'sado' ? '#bff8ee' : '#f2e6c8' });
   ctx.restore();
 });
 PIXEL_DRAW.push((ctx, st) => {
