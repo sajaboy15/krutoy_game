@@ -39,52 +39,35 @@ Yodgor_project/
 ## Decisions the author already made (do not re-ask)
 Target length strictly 10 h; open world (17 regions, see GDD ch.3); three yodchi branches **Взыскание / Хребет / Запретная песнь** (Uzbek: **Hisob-kitob / Bardosh / Yashirin navo**); attributes Сила/Ловкость/Стойкость/Память; 7 weapon categories, mods, 10 legendaries; armour + charms + inventory; merchants on the Bazaar; three factions with 6-quest arcs and double play; companions **Alp, Nargiza and Surayyo** (Surayyo = the only romance, the Tail's mirab, woven into the main plot; party of 4 incl. Ravshan); hard but fair combat, Dark-Souls-style boss movesets, no damage sponges; companions make fights harder, not easier; money is scarce, fast travel free from chaikhanas; Hollowness hidden in choices; honest names in Sado's tree after the reveal; no dialogue timers; voice acting secondary; Ошиқ mini-game with simplified rules. Full list: GDD chapter 27.
 
-## Status (as of 4 Nov 2026, evening)
-Roadmap = GDD chapter 26. Progress ≈ 62%. Review sheets for all rewritten texts are in notes/.
+## Status (as of 5 Nov 2026)
+Roadmap = GDD chapter 26. All ten stages now have their systems in; what is left is measuring, balancing and reading.
+Review sheets for rewritten texts are in notes/. Branch: claude/kind-galileo-81p728.
 
 **DONE**
 - **Stage 1, fixes.** Black-screen watchdog + F9 + exe reset (96_gfx.js, launcher). Tale ending name flag. Sado tree spoiler masks. New Seven boss (65_boss_seven.js). Painted epilogue slides (99_epilogue.js, 105 variants).
 - **Stage 2, dialogue.** Acts 70/71/72 and all system/world/item texts rewritten by meaning in RU/UZ. No moral tags; Hollowness cost hidden.
-- **Stage 3, character system.** 62_balance, 64_progress, 66_character, 67_items, 68_inventory_ui; tests test/s3_*.js. Attributes, levels, 3 branches, 47 weapons + 10 legendaries, armour sets, charms, inventory, smith. 8% per-hit boss cap.
-- **Stage 4, open-world framework.** 80–84_world_*.js; test/s4_*.js. W2 API documented in the 80_world_core.js header.
-- **Stage 5, story in the open world.** 85a_world_more, 85b_world_keys, 85c_world_story; test/s5_*.js. 17 regions, 58 two-way exits, 14 chaikhanas, all 5 endings reachable from "New journey"; s5_route.js plays them.
-- **Stage 6, factions.** 75_factions, 76/77/78 arcs (18 quests), 79_economy_crime, faction bosses 65s_shirin / 65t_humo / 65u_oydin; test/s6_*.js. Reputation, double play, journal [N], merchants and haggling, stealth and crime.
-- **Stage 7a, companion systems.** 86_party, 87_party_ai, 88_party_ui; test/s7_*.js. Alp / Nargiza / Surayyo in combat, approval, stances [V], orders 1/2/3, downed/revive, branches. Debug: `?stage=N&god&party=alp,nargiza,surayyo`.
+- **Stage 3, character system.** 62_balance, 64_progress, 66_character, 67_items, 68_inventory_ui; tests test/s3_*.js.
+- **Stage 4, open-world framework.** 80–84_world_*.js; test/s4_*.js. W2 API in the 80_world_core.js header.
+- **Stage 5, story in the open world.** 85a/85b/85c; test/s5_*.js. 17 regions, all 5 endings reachable.
+- **Stage 6, factions.** 75–79; test/s6_*.js.
+- **Stage 7a, companion systems.** 86_party, 87_party_ai, 88_party_ui; test/s7_*.js.
+- **Stage 7b, companions in the story.** 88b kit, 88c Alp, 88d Nargiza, 88e Surayyo (romance), 88f the Alp–Nargiza knot, 88g/88h 64 camp talks; test/s7b_comp.js.
+- **Stage 8a, boss movesets.** 65a–65h + 65v_boss_tune.js; tests s8_moves/s8_fight/s8_deaths; notes/s8_results.md. Perfect bot still takes 2–9 hits per fight.
+- **Stage 8b, enemies.** 89o_enemies.js: 20 new types (66 regular types in 9 families), 7 elite modifiers (+2 in NG+), attack tokens (1/2/3 attackers by difficulty), Divan vs Those Who Remember. 89p_minibosses.js: the 8 GDD minibosses with their mechanics, top bar, 150 XP / 60–100 tilla. test/s8b_mb.js.
+- **Stage 9, content.** Regions dressed (89_world_dress, 89b_world_folk). Side stories: 79m kit, 79n cameo «The Blue Wolf» (Sherzod & Azamat), 89c–89f (sd4–sd20; sd1–3 live in the acts). 89i Oshiq (30 alchiks, 12 opponents, tournament). 89j hunts (10 contracts). 89k 19 world events (+6 moments in 89b = 25). 89l yodchi's book [Y]: notes, memories, bestiary, collected, deeds, people, chronicle. 89m_books_a/b: 60 notes (20 point to caches with materials/recipes). 89n crafts: alchemy (Zebo), kitchen (chaikhana), tumar sewing (Ma'ruf), 36 recipes, herbs, trophies. Tests s9_*.js.
+- **Stage 10, polish.** 01_settings.js: key remapping (keyboard + gamepad, engine and Yodgor keys), text speed, subtitle size, clean HUD, hints (menu: Options → Controls, text, screen). 89q_ach.js: 40 achievements, play-time counter, New Game+ (carry Ravshan, enemies ×1.4, one new move per boss, Sado's NG+ lines). 89r_music.js: night versions of region music. 99b_cutscenes.js: painted slides at each new moon (acts I–III). Tests s10_meta.js, s10_cut.js.
 
-**IN PROGRESS**
-- **Stage 8a, Souls-like boss movesets** (65a–65h, 65v_boss_tune.js = per-boss damage scale). Session of 4 Nov (evening):
-  - All 62 moves fire and end without page errors (test/s8_moves.js).
-  - Telegraph data fixed where it lied (Hound dash/coins, Kampir spit, Albasty tide/crawl, Choir glyphs/rings, Ak Bars swipe, Ajdaho dive/strafe); wave threats stay live while the wave runs.
-  - Perfect bot (test/s8_fight.js <pi> perfect, S8_TRACE=1 for per-hit traces): 2–5 hits per fight left for most bosses (not yet 0). Ajdaho hp 1000→720 (its head is rarely in reach): perfect bot kills it in ~5.7 min.
-  - Average bot deaths (test/s8_deaths.js, pool several runs: one run is far too noisy) and per-category kill times: being measured; 65v values are provisional.
-  - Party: kill time −5…−15%, companions are downed in most boss fights (they now read the telegraphs and dodge 3 of 4); the bot hero never revives them.
-
-**REGIONS — first pass done (4 Nov evening)**: 89_world_dress.js (light along every floor run, props, hangings, life, deep backgrounds lifted, own looks for the Tower (ashen dusk, dakhma, crows) and the Withers (dawn above the clouds, sky caravanserai)), 89b_world_folk.js (a local and two finds in Streets, Mines, Tower, Rabat, Withers, Spine; review sheet notes/review_regions_folk.md). Before/after sheets: notes/shots_regions/. Tests: s9_regions.js, s9_folk.js, s4_perf.js REGS=… (+1.5 ms/frame). Still to do: events, more secrets, the regions' playing time (s5_traverse.js).
-**WAS TOP PRIORITY (the author's complaint)**
-- **Regions look empty.** Many are sparse or too dark: Swallowed Streets, Heart, Salt Mines, Tower of Silence, Rabat.
-  - Cause: the art was made for the old short stages; the widened regions have bare walls and empty backgrounds.
-  - Fix:
-    - dress every region along its full length with decor, light, life, NPCs, events and secrets;
-    - open up the deep regions' backgrounds;
-    - make Tower vs Rabat and Withers vs Spine look clearly different.
-  - Regions also give only 30–45% of the planned minutes (test/s5_traverse.js measures them).
-  - Reference for quality: Ark gardens, Dream of the City, Tail at dusk.
-
-**REMAINING STAGES**
-- **7b.** Place the companions in the story: Alp/Nargiza/Surayyo personal arcs, the Alp–Nargiza knot, camp-chaikhana talks (~60 scenes), Surayyo romance (GDD ch.7).
-- **8b.** Enemy families (~40 types), elites, 8 minibosses.
-- **9.** 20 side stories (GDD ch.20), hunts, world events, Ошиқ mini-game, books, collections.
-- **10.** Polish: cutscenes, key remapping, NG+, achievements, music by region/time, final balance, a real 10-hour measurement.
+**NOT DONE / NEEDS THE AUTHOR**
+- Side story 21 «A Father's Tithe» (BIBLE §10): the author said do NOT make it.
+- A real 10-hour playthrough measurement (GDD ch. 25) and the final balance pass after it. s5_traverse.js measures regions; the counter in the book (Deeds → play time) measures a human run.
+- Proofreading of all new RU/UZ texts by the author (stages 7b–10 added a lot: books, camp talks, events, bestiary).
+- Boss perfect-bot still takes hits; ranged/focus builds on some bosses need a hand check.
+- s9_side.js: sd12, sd7, sd16 stop on test flow (the bot's choice picker), not confirmed as game bugs.
 
 **KNOWN ISSUES**
-- (fixed 4 Nov) Companions climb ladder tiles and follow the hook line (test/s7_hook.js: 0 teleports); the open-world karez has no ladder tiles.
-- Albasty wipes the party — now every boss downs the companions unless the hero revives them (see 8a).
-- (fixed 4 Nov) Controls screen page 2 lists the new keys (96b_controls.js, arrows turn the page).
-- (fixed 4 Nov) Humo has its own golden-bird drawing (65t).
-- UZ main menu shows «Sozlamalar» twice (Параметры and Настройки both translate to it).
+- Every boss downs the companions unless the hero revives them (by design: companions make fights harder).
+- The yodchi's book moved from L to Y: L is the engine's second roll key.
 
-**OPEN QUESTION FOR THE AUTHOR**
-- design/BIBLE.md §10 (Sherzod and Bobokhon-aka, side story "A Father's Tithe"): it is unclear whether the author wants it. Do not implement it until he confirms.
 ## Working in parallel with the other chat
 The author also works with Claude in a claude.ai chat on the same project. To avoid conflicts, agree on **file ownership** per task (one owner per file at a time) and sync through git (recommended: a private GitHub repo). Before starting, pull; after finishing a task, run the tests and commit with a clear message.
 
