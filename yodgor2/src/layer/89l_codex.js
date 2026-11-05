@@ -203,7 +203,7 @@
   if (CU && CU.EXT) {
     const UI = CU, D0 = () => UI._dbg;
     UI.PAGES.push('book'); UI.PAGE_NAME.book = `Yodchi's book|Книга ёдчи|Yodchi kitobi`; UI.PAGE_KEY.book = 'Y'; UI.EXT_KEY.KeyY = 'book';
-    const SEC = [`Notes|Записки|Xatlar`, `Memories|Воспоминания|Xotiralar`, `Bestiary|Бестиарий|Maxluqnoma`, `Collected|Собрано|To'plangan`, `Deeds|Деяния|Ishlar`];
+    const SEC = [`Notes|Записки|Xatlar`, `Memories|Воспоминания|Xotiralar`, `Bestiary|Бестиарий|Maxluqnoma`, `Collected|Собрано|To'plangan`, `Deeds|Деяния|Ishlar`, `People|Люди|Odamlar`, `Chronicle|Летопись|Solnoma`];
     const PS = CODEX.page = { sec: 0, sel: 0, scroll: 0 };
     const COL = { gold: '#e2b452', goldL: '#ffe7a6', dim: '#9a8c9e', cream: '#f2e6c8', bad: '#ff8a7a', good: '#9cf0a0', lav: '#c9b4ff' };
     // the rows of a section: {label, sub, col, body:[strings], head}
@@ -241,6 +241,24 @@
           }
         }
         return out;
+      }
+      if (PS.sec === 5) {
+        // the people you have talked to: where they were, and where they usually are
+        const W2 = G.WORLD2, met = R().met || {};
+        const rn = id => { const r = W2 && W2.regions[id]; return r ? t(r.name) : id; };
+        return Object.keys(met).map(id => {
+          const n = W2.npcs[id] || {}, nm = n.name ? t(n.name) : (CAST[id] ? t(CAST[id].name) : id);
+          const sch = (n.sched || []).map(w => (w.from != null ? w.from + '–' + w.to + ': ' : '') + rn(w.region)).slice(0, 4);
+          const body = [tf(`Last spoken to: {r}, day {d}.|Последний разговор: {r}, день {d}.|Oxirgi suhbat: {r}, {d}-kun.`, { r: rn(met[id].r), d: met[id].d })];
+          if (sch.length) body.push(t(`Usually:|Обычно:|Odatda:`) + ' ' + sch.join(' · '));
+          return { label: nm, col: COL.cream, body };
+        }).sort((a, b) => a.label.localeCompare(b.label));
+      }
+      if (PS.sec === 6) {
+        // the record of what you did: the journal's entries, newest first
+        const J = (G.FAC && G.FAC.S && G.FAC.S().jr) || [];
+        const QT = id => { const Q = G.FAC && G.FAC.Q[id]; return Q ? t(Q.title) : ''; };
+        return J.slice().reverse().map(e => ({ label: tf(`Day {d} · {q}|День {d} · {q}|{d}-kun · {q}`, { d: e.d || 1, q: QT(e.id) }), col: COL.cream, body: [t(e.t)] }));
       }
       if (PS.sec === 4) {
         const A = G.ACH; if (!A) return [];
@@ -285,9 +303,9 @@
       draw(ctx, HIT) {
         const { panel, txt, inset, plate, para } = D0();
         SEC.forEach((s, i) => {
-          const w = 84, x = 22 + i * (w + 4), on = i === PS.sec; if (x + w > G.W - 14) return;
+          const w = Math.floor((440 - (SEC.length - 1) * 4) / SEC.length), x = 22 + i * (w + 4), on = i === PS.sec;
           plate(ctx, x, 36, w, on ? '#3a2a14' : '#1d1626', on);
-          txt(ctx, t(s).toUpperCase(), x + w / 2, 38.6, { size: 5, align: 'center', color: on ? COL.goldL : COL.dim, weight: 700, serif: true });
+          txt(ctx, t(s).toUpperCase(), x + w / 2, 39, { size: SEC.length > 5 ? 4.2 : 5, align: 'center', color: on ? COL.goldL : COL.dim, weight: 700, serif: true });
           HIT.push({ x, y: 34, w, h: 15, click: () => { PS.sec = i; PS.sel = 0; PS.scroll = 0; sfx('ui_move'); } });
         });
         const L = rows();

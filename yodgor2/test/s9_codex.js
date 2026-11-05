@@ -30,7 +30,8 @@ const T = require('./s6_lib');
     return { water: a, plov: b, fireLocked: c, used, isiriq: Y.count('mat_isiriq'), known: C.known(), antidote: C.isKnown('r_antidote') };
   });
   const shots = [];
-  for (let s = 0; s < 4; s++) {
+  await W(() => { const r = G.YODGOR.run; r.met = { zebo: { r: 'tail', d: 2 }, maruf: { r: 'potters', d: 3 } }; G.FAC.S().jr.push({ id: 'sd12', t: 'Tea for three|Чай на троих|Uch kishilik choy', d: 2 }); });
+  for (let s = 0; s < 7; s++) {
     await W(s => { G.CHUI.openPage('book'); G.CODEX.page.sec = s; G.CODEX.page.sel = s === 2 ? 1 : 0; }, s);
     await W(() => G.debugTick(0)); await W(() => G.debugTick(0));
     const f = process.env.SHOT_DIR ? require('path').join(process.env.SHOT_DIR, 'codex' + s + '.png') : null;

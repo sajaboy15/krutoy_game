@@ -185,7 +185,7 @@
         if (!p) continue;
         o = new G.Interactable(p.x + (n.dx || 0), p.y, { art: 'person', w: 14, h: 30, look: n.look, phase: id.length * 31, face: n.face || -1, prompt: n.prompt ? t(n.prompt) : tf(`Talk to {n}|Говорить: {n}|Gaplashish: {n}`, { n: t(n.name || '') }) });
         o.interact = !!n.talk; o.layer = -1; o._w2npc = id;
-        if (n.talk) o.onUse = () => { if (!busy) scene(done => n.talk(done, o)); return true; };
+        if (n.talk) o.onUse = () => { if (!busy) { try { const r = R(); (r.met = r.met || {})[id] = { r: W2.active, d: (W2.S() && W2.S().day) || 1 }; } catch (e) { /* ignore */ } scene(done => n.talk(done, o)); } return true; };
         G.world.add(o); people.set(id, o);
       } else if (!here && o) { o.dead = true; people.delete(id); }
     }
