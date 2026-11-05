@@ -1752,6 +1752,9 @@ def('tail:stories', 'well', { mood: 'dusk', light: '#ffd08a', post: c => {
   // test hooks
   // new epilogue subjects (side stories, companions' arcs) borrow an existing painting: EPI.alias('cameo', 'tail:stories')
   EPI.alias = (k, id) => { FALLBACK[k] = id; };
+  // cutscenes (99b) define their own pictures from the same painters
+  EPI.def = def; EPI.FXK = FX; EPI.DUR = DUR;
+  EPI.paintA = (c, id, tt, dir, a) => { c.save(); c.imageSmoothingEnabled = false; drawSlide(c, { id, dir: dir || 1, dy: 0 }, tt, a); c.restore(); };
   EPI.sceneIdFor = sceneIdFor; EPI.scenes = () => Object.keys(SCENE_OF); EPI.goTo = n => goTo(n);
   EPI.renderScene = (id, tt) => { const s = want(id); finishScene(s); return s.ready; };
   EPI.paintTo = (c, id, tt, dir) => { c.save(); c.imageSmoothingEnabled = false; c.fillStyle = '#040208'; c.fillRect(0, 0, G.W, G.H); drawSlide(c, { id, dir: dir || 1, dy: 0 }, tt || DUR / 2, 1); c.restore(); };
