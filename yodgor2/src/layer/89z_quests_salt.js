@@ -218,7 +218,7 @@
       return;
     }
     play([
-      ['', `Ten steps in, the salt underfoot turns warm and soft. Something in you wants to keep walking: there's a lit window ahead, and someone calling you in to supper. You count your steps back. Eleven. You went in ten.|Через десять шагов соль под ногами становится тёплой и мягкой. Что-то в тебе хочет идти дальше: впереди светится окно и кто-то зовёт ужинать. Считаешь шаги обратно. Одиннадцать. Входил ты на десять.|O'n qadamdan keyin oyoq ostidagi tuz iliq va yumshoq bo'lib qoladi. Ichingdagi nimadir oldinga intiladi: oldinda deraza yonib turibdi, kimdir kechki ovqatga chaqiryapti. Orqaga sanaysan. O'n bir qadam. Kirganingda o'nta edi.`],
+      ['', `Ten steps in, the salt underfoot turns warm and soft. Something in you wants to keep walking: there's a lit window ahead, and someone calling you in to supper. You count your steps back. Eleven. You went in ten.|Через десять шагов соль под ногами становится тёплой и мягкой. Что-то в тебе хочет идти дальше: впереди светится окно и кто-то зовёт ужинать. Считаешь шаги обратно. Одиннадцать. Входил ты на десять.|O'n qadamdan keyin oyoq ostidagi tuz iliq va yumshoq bo'lib qoladi. Ichingdagi nimadir oldinga intiladi: oldinda chiroqli deraza, kimdir ovqatga chaqiryapti. Orqaga sanaysan. O'n bir qadam. Kirganingda o'nta edi.`],
       ['', `At your feet lies a clay token on a cord: Bathhouse Lane, turn nine. And a waterskin, half full. Whoever he was, he wasn't thirsty.|У ног лежит глиняная бирка на шнурке: Банный переулок, очередь девятая. И бурдюк, полный наполовину. Кто бы это ни был, пить ему не хотелось.|Oyog'ing ostida ipli sopol belgi yotibdi: Hammom ko'chasi, to'qqizinchi navbat. Yana yarmigacha to'la mesh. Kim bo'lmasin, u chanqamagan.`]
     ], found);
   });
